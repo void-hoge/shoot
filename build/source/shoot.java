@@ -53,7 +53,7 @@ class gun extends item{
         penetration = 0.5f;
         range = 500;
         amo = 100;
-        rate = 20;
+        rate = 30;
         shootcount = 0;
     }
 }
