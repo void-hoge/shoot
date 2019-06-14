@@ -1,15 +1,26 @@
 class world{
     player pl;
+    item[] hoge;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
+        hoge = new item[1000];
+        for (int i = 0; i < hoge.length; i++) {
+            hoge[i] = new gun(i%4);
+            hoge[i].x = random(0, world_width);
+            hoge[i].y = random(0, world_height);
+        }
         pl = new player();
     }
     void display(){
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
+
+        for (int i = 0; i < hoge.length; i++) {
+            // hoge[i].display();
+        }
 
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
@@ -22,7 +33,6 @@ class world{
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
-
         pl.display();
     }
 }

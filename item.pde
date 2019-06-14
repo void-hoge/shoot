@@ -1,8 +1,9 @@
-class item{
+abstract public class item{
     float x, y;
+    abstract void display();
 }
 
-class armar extends item{
+public class armar extends item{
     int armar_level;
     float hitpoints;
     armar(int level){
@@ -12,21 +13,67 @@ class armar extends item{
     float get_hitpoints(){
         return hitpoints;
     }
+    void display(){
+        text(armar_level, x, y);
+    }
 }
 
+final int SMG = 0;
+final int AR = 1;
+final int SR = 2;
+final int HG = 3;
+
 class gun extends item{
+    int type;
     float damage;
-    float penetration;
     float range;
     int amo;
-    float rate;   //cool time(frame)
-    int shootcount;
-    gun(){
-        damage = 50;
-        penetration = 0.5;
-        range = 500;
-        amo = 100;
-        rate = 30;
-        shootcount = 0;
+    int mag_size;       //未実装
+    int rate;
+    int shoot_ct;//cool time
+    float dispersion;
+    float gap;
+    gun(int t){
+        type = t;
+        switch (type){
+            case SMG:
+                damage = 10;
+                amo = 200;
+                rate = 4;           //900rpm
+                range = 400;
+                dispersion = 0.2;
+                break;
+            case AR:
+                damage = 20;
+                amo = 100;
+                rate = 6;           //600rpm
+                range = 700;
+                dispersion = 0.05;
+                break;
+            case SR:
+                damage = 90;
+                amo = 20;
+                rate = 120;         //30rpm
+                range = 2000;
+                dispersion = 0.01;
+                break;
+            case HG:
+                damage = 15;
+                amo = 100;
+                rate = 20;          //180rpm
+                range = 400;
+                dispersion = 0.1;
+                break;
+        }
+        shoot_ct = 0;
+        set_gap();
+        x = 0;
+        y = 0;
+    }
+    void set_gap(){
+        gap = random(-dispersion, dispersion);
+    }
+    void display(){
+        text(type, x, y);
     }
 }

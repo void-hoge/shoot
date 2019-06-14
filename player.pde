@@ -18,18 +18,18 @@ class player{
 
     armar arma;
     gun main;
-    gun gun2;
 
     player(){
         pos = new coordinate();
         arma = new armar(4);
-        main = new gun();
+        main = new gun(SMG);
         facing = 0;
         hitpoints = 100 + arma.hitpoints;
         entity_size = 50;
     }
 
     void display(){
+        main.display();
         update_pos();
         shoot();
         noStroke();
@@ -44,14 +44,16 @@ class player{
     }
 
     void shoot(){
-        if (mousePressed&&((main.shootcount % main.rate) == 0)){
+        if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             translate(0, 0);
             PVector mouse = new PVector(mouseX-width/2-pos.x, mouseY-height/2-pos.y);
             stroke(255, 212, 0);
             strokeWeight(4);
-            line(-pos.x, -pos.y, cos(facing)*main.range-pos.x, sin(facing)*main.range-pos.y);
+            line(-pos.x, -pos.y, cos(facing+main.gap)*main.range-pos.x, sin(facing+main.gap)*main.range-pos.y);
+            main.shoot_ct = main.rate;
+            main.set_gap();
+            main.amo--;
         }
-        main.shootcount++;
     }
 
     void update_pos(){
@@ -72,6 +74,7 @@ class player{
             }
         }
         facing = atan2(mouseY-height/2, mouseX-width/2);
+        main.shoot_ct--;
     }
 
     coordinate get_pos(){

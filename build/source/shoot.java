@@ -19,17 +19,19 @@ system sys;
 public void setup(){
     
     sys = new system();
+    frameRate(60);
 }
 
 public void draw(){
     translate(width/2,height/2);
     sys.display();
 }
-class item{
+abstract public class item{
     float x, y;
+    public abstract void display();
 }
 
-class armar extends item{
+public class armar extends item{
     int armar_level;
     float hitpoints;
     armar(int level){
@@ -39,22 +41,68 @@ class armar extends item{
     public float get_hitpoints(){
         return hitpoints;
     }
+    public void display(){
+        text(armar_level, x, y);
+    }
 }
 
+final int SMG = 0;
+final int AR = 1;
+final int SR = 2;
+final int HG = 3;
+
 class gun extends item{
+    int type;
     float damage;
-    float penetration;
     float range;
     int amo;
-    float rate;   //cool time(frame)
-    int shootcount;
-    gun(){
-        damage = 50;
-        penetration = 0.5f;
-        range = 500;
-        amo = 100;
-        rate = 30;
-        shootcount = 0;
+    int mag_size;       //未実装
+    int rate;
+    int shoot_ct;//cool time
+    float dispersion;
+    float gap;
+    gun(int t){
+        type = t;
+        switch (type){
+            case SMG:
+                damage = 10;
+                amo = 200;
+                rate = 4;           //900rpm
+                range = 400;
+                dispersion = 0.2f;
+                break;
+            case AR:
+                damage = 20;
+                amo = 100;
+                rate = 6;           //600rpm
+                range = 700;
+                dispersion = 0.05f;
+                break;
+            case SR:
+                damage = 90;
+                amo = 20;
+                rate = 120;         //30rpm
+                range = 2000;
+                dispersion = 0.01f;
+                break;
+            case HG:
+                damage = 15;
+                amo = 100;
+                rate = 20;          //180rpm
+                range = 400;
+                dispersion = 0.1f;
+                break;
+        }
+        shoot_ct = 0;
+        set_gap();
+        x = 0;
+        y = 0;
+    }
+    public void set_gap(){
+        gap = random(-dispersion, dispersion);
+    }
+    public void display(){
+        text(type, x, y);
     }
 }
 class object{
@@ -117,18 +165,18 @@ class player{
 
     armar arma;
     gun main;
-    gun gun2;
 
     player(){
         pos = new coordinate();
         arma = new armar(4);
-        main = new gun();
+        main = new gun(SMG);
         facing = 0;
         hitpoints = 100 + arma.hitpoints;
         entity_size = 50;
     }
 
     public void display(){
+        main.display();
         update_pos();
         shoot();
         noStroke();
@@ -143,14 +191,16 @@ class player{
     }
 
     public void shoot(){
-        if (mousePressed&&((main.shootcount % main.rate) == 0)){
+        if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             translate(0, 0);
             PVector mouse = new PVector(mouseX-width/2-pos.x, mouseY-height/2-pos.y);
             stroke(255, 212, 0);
             strokeWeight(4);
-            line(-pos.x, -pos.y, cos(facing)*main.range-pos.x, sin(facing)*main.range-pos.y);
+            line(-pos.x, -pos.y, cos(facing+main.gap)*main.range-pos.x, sin(facing+main.gap)*main.range-pos.y);
+            main.shoot_ct = main.rate;
+            main.set_gap();
+            main.amo--;
         }
-        main.shootcount++;
     }
 
     public void update_pos(){
@@ -171,6 +221,7 @@ class player{
             }
         }
         facing = atan2(mouseY-height/2, mouseX-width/2);
+        main.shoot_ct--;
     }
 
     public coordinate get_pos(){
@@ -188,16 +239,27 @@ class system{
 }
 class world{
     player pl;
+    item[] hoge;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
+        hoge = new item[1000];
+        for (int i = 0; i < hoge.length; i++) {
+            hoge[i] = new gun(i%4);
+            hoge[i].x = random(0, world_width);
+            hoge[i].y = random(0, world_height);
+        }
         pl = new player();
     }
     public void display(){
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
+
+        for (int i = 0; i < hoge.length; i++) {
+            // hoge[i].display();
+        }
 
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
@@ -210,7 +272,6 @@ class world{
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
-
         pl.display();
     }
 }
