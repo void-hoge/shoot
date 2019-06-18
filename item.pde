@@ -16,6 +16,35 @@ public class armar extends item{
     void display(){
         text(armar_level, x, y);
     }
+    void showHP(){
+        if (armar_level != 0){
+            stroke(0);
+            strokeWeight(1);
+            noFill();
+            rect(-width/2+250, height/2-150, -armar_level*25*2, 30);
+            switch (armar_level){
+                case 1:
+                    //white
+                    fill(255);
+                    break;
+                case 2:
+                    //blue
+                    fill(#87CEFA);
+                    break;
+                case 3:
+                    //purple
+                    fill(#9370DB);
+                    break;
+                case 4:
+                    //yellow (gold)
+                    fill(#FFFF00);
+                    break;
+            }
+            noStroke();
+
+            rect(-width/2+250, height/2-150, -hitpoints*2, 30);
+        }
+    }
 }
 
 final int SMG = 0;

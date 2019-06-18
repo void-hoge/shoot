@@ -21,7 +21,7 @@ class player{
 
     player(){
         pos = new coordinate();
-        arma = new armar(4);
+        arma = new armar(3);
         main = new gun(SMG);
         facing = 0;
         hitpoints = 100;
@@ -33,56 +33,30 @@ class player{
         main.display();
         update_pos();
         shoot();
-
+        translate(-pos.x, -pos.y);
+        showHP();
+        arma.showHP();
+        rotate(facing);
+        strokeWeight(3);
+        stroke(255, 50);
+        line(0, 0, main.range, 0);
         noStroke();
         fill(255);
-        translate(-pos.x, -pos.y);
-        rotate(facing);
         ellipse(0, 0, entity_size, entity_size);
         fill(0);
         ellipse(entity_size/2, -15, 10, 10);
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
+    }
 
-
+    void showHP(){
+        strokeWeight(1);
         stroke(0);
         noFill();
-        rect(50, -50, -100, 10);
+        rect(-width/2+250, height/2-100, -100*2, 30);
         noStroke();
         fill(255);
-        rect(50, -50, -hitpoints, 10);
-
-        // stroke(0);
-        // noFill();
-        // rect(50, -60, -100, 10);
-        // noStroke();
-        // rect(50, -60, -(hitpoints-100),10);
-        if (arma.armar_level != 0){
-            stroke(0);
-            noFill();
-            rect(-width/2+250, height/2-150, -arma.armar_level*25*2, 30);
-            switch (arma.armar_level){
-                case 1:
-                    //white
-                    fill(255);
-                    break;
-                case 2:
-                    //blue
-                    fill(#87CEFA);
-                    break;
-                case 3:
-                    //purple
-                    fill(#9370DB);
-                    break;
-                case 4:
-                    //yellow (gold)
-                    fill(#FFFF00);
-                    break;
-            }
-            noStroke();
-
-            rect(-width/2+250, height/2-150, -arma.hitpoints*2, 30);
-        }
+        rect(-width/2+250, height/2-100, -hitpoints*2, 30);
     }
 
     void shoot(){
