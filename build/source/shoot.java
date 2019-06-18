@@ -101,7 +101,7 @@ class gun extends item{
                 rate = 4;           //900rpm
                 range = 400;
                 dispersion = 0.2f;
-                weight = 0.1f;
+                weight = 0.15f;
                 break;
             case AR:
                 damage = 20;
@@ -109,7 +109,7 @@ class gun extends item{
                 rate = 6;           //600rpm
                 range = 700;
                 dispersion = 0.05f;
-                weight = 0.06f;
+                weight = 0.08f;
                 break;
             case SR:
                 damage = 90;
@@ -137,6 +137,7 @@ class gun extends item{
         gap = random(-dispersion, dispersion);
     }
     public void display(){
+        textSize(10);
         text(type, x, y);
         switch (type){
             case SMG:
@@ -218,10 +219,10 @@ class player{
     player(){
         pos = new coordinate();
         arma = new armar(3);
-        main = new gun(SMG);
+        main = new gun(SR);
         facing = 0;
         hitpoints = 100;
-        // hitpoints = 50;
+        hitpoints = 50;
         entity_size = 50;
     }
 
@@ -232,6 +233,7 @@ class player{
         translate(-pos.x, -pos.y);
         showHP();
         arma.showHP();
+        showAMO();
         rotate(facing);
         strokeWeight(3);
         stroke(255, 50);
@@ -253,6 +255,12 @@ class player{
         noStroke();
         fill(255);
         rect(-width/2+250, height/2-100, -hitpoints*2, 30);
+    }
+
+    public void showAMO(){
+        fill(0);
+        textSize(40);
+        text(main.amo, width/2-100, height/2-100);
     }
 
     public void shoot(){
@@ -286,6 +294,9 @@ class player{
             }
         }
         float facing_target = atan2(mouseY-height/2, mouseX-width/2);
+        if(abs(facing_target-facing) > radians(180)){
+            facing_target+=radians(360);
+        }
         facing += (facing_target - facing)*main.weight;
         main.shoot_ct--;
     }
@@ -338,7 +349,6 @@ class world{
             hoge[i].display();
         }
         pl.display();
-        textSize(15);
     }
 }
   public void settings() {  size(1440, 810); }

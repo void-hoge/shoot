@@ -33,6 +33,5 @@ class world{
             hoge[i].display();
         }
         pl.display();
-        textSize(15);
     }
 }

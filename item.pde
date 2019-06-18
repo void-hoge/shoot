@@ -72,7 +72,7 @@ class gun extends item{
                 rate = 4;           //900rpm
                 range = 400;
                 dispersion = 0.2;
-                weight = 0.1;
+                weight = 0.15;
                 break;
             case AR:
                 damage = 20;
@@ -80,7 +80,7 @@ class gun extends item{
                 rate = 6;           //600rpm
                 range = 700;
                 dispersion = 0.05;
-                weight = 0.06;
+                weight = 0.08;
                 break;
             case SR:
                 damage = 90;
@@ -108,6 +108,7 @@ class gun extends item{
         gap = random(-dispersion, dispersion);
     }
     void display(){
+        textSize(10);
         text(type, x, y);
         switch (type){
             case SMG:
