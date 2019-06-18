@@ -33,6 +33,7 @@ class gun extends item{
     int shoot_ct;//cool time
     float dispersion;
     float gap;
+    float weight;
     gun(int t){
         type = t;
         switch (type){
@@ -42,6 +43,7 @@ class gun extends item{
                 rate = 4;           //900rpm
                 range = 400;
                 dispersion = 0.2;
+                weight = 0.1;
                 break;
             case AR:
                 damage = 20;
@@ -49,6 +51,7 @@ class gun extends item{
                 rate = 6;           //600rpm
                 range = 700;
                 dispersion = 0.05;
+                weight = 0.06;
                 break;
             case SR:
                 damage = 90;
@@ -56,6 +59,7 @@ class gun extends item{
                 rate = 120;         //30rpm
                 range = 2000;
                 dispersion = 0.01;
+                weight = 0.03;
                 break;
             case HG:
                 damage = 15;
@@ -63,6 +67,7 @@ class gun extends item{
                 rate = 20;          //180rpm
                 range = 400;
                 dispersion = 0.1;
+                weight = 0.4;
                 break;
         }
         shoot_ct = 0;
@@ -75,5 +80,19 @@ class gun extends item{
     }
     void display(){
         text(type, x, y);
+        switch (type){
+            case SMG:
+                text("SMG", x, y);
+                break;
+            case AR:
+                text("AR", x, y);
+                break;
+            case SR:
+                text("SR", x, y);
+                break;
+            case HG:
+                text("HG", x, y);
+                break;
+        }
     }
 }

@@ -24,7 +24,8 @@ class player{
         arma = new armar(4);
         main = new gun(SMG);
         facing = 0;
-        hitpoints = 100 + arma.hitpoints;
+        hitpoints = 100;
+        // hitpoints = 50;
         entity_size = 50;
     }
 
@@ -32,6 +33,7 @@ class player{
         main.display();
         update_pos();
         shoot();
+
         noStroke();
         fill(255);
         translate(-pos.x, -pos.y);
@@ -41,6 +43,46 @@ class player{
         ellipse(entity_size/2, -15, 10, 10);
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
+
+
+        stroke(0);
+        noFill();
+        rect(50, -50, -100, 10);
+        noStroke();
+        fill(255);
+        rect(50, -50, -hitpoints, 10);
+
+        // stroke(0);
+        // noFill();
+        // rect(50, -60, -100, 10);
+        // noStroke();
+        // rect(50, -60, -(hitpoints-100),10);
+        if (arma.armar_level != 0){
+            stroke(0);
+            noFill();
+            rect(-width/2+250, height/2-150, -arma.armar_level*25*2, 30);
+            switch (arma.armar_level){
+                case 1:
+                    //white
+                    fill(255);
+                    break;
+                case 2:
+                    //blue
+                    fill(#87CEFA);
+                    break;
+                case 3:
+                    //purple
+                    fill(#9370DB);
+                    break;
+                case 4:
+                    //yellow (gold)
+                    fill(#FFFF00);
+                    break;
+            }
+            noStroke();
+
+            rect(-width/2+250, height/2-150, -arma.hitpoints*2, 30);
+        }
     }
 
     void shoot(){
@@ -73,7 +115,8 @@ class player{
                     break;
             }
         }
-        facing = atan2(mouseY-height/2, mouseX-width/2);
+        float facing_target = atan2(mouseY-height/2, mouseX-width/2);
+        facing += (facing_target - facing)*main.weight;
         main.shoot_ct--;
     }
 

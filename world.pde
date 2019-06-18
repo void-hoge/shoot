@@ -8,8 +8,8 @@ class world{
         hoge = new item[1000];
         for (int i = 0; i < hoge.length; i++) {
             hoge[i] = new gun(i%4);
-            hoge[i].x = random(0, world_width);
-            hoge[i].y = random(0, world_height);
+            hoge[i].x = random(-world_width/2, world_width/2);
+            hoge[i].y = random(-world_width/2, world_height/2);
         }
         pl = new player();
     }
@@ -17,10 +17,6 @@ class world{
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
-
-        for (int i = 0; i < hoge.length; i++) {
-            // hoge[i].display();
-        }
 
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
@@ -33,6 +29,10 @@ class world{
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
+        for (int i = 0; i < hoge.length; i++) {
+            hoge[i].display();
+        }
         pl.display();
+        textSize(15);
     }
 }

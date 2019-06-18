@@ -24,6 +24,7 @@ public void setup(){
 
 public void draw(){
     translate(width/2,height/2);
+    textAlign(CENTER);
     sys.display();
 }
 abstract public class item{
@@ -61,6 +62,7 @@ class gun extends item{
     int shoot_ct;//cool time
     float dispersion;
     float gap;
+    float weight;
     gun(int t){
         type = t;
         switch (type){
@@ -70,6 +72,7 @@ class gun extends item{
                 rate = 4;           //900rpm
                 range = 400;
                 dispersion = 0.2f;
+                weight = 0.1f;
                 break;
             case AR:
                 damage = 20;
@@ -77,6 +80,7 @@ class gun extends item{
                 rate = 6;           //600rpm
                 range = 700;
                 dispersion = 0.05f;
+                weight = 0.06f;
                 break;
             case SR:
                 damage = 90;
@@ -84,6 +88,7 @@ class gun extends item{
                 rate = 120;         //30rpm
                 range = 2000;
                 dispersion = 0.01f;
+                weight = 0.03f;
                 break;
             case HG:
                 damage = 15;
@@ -91,6 +96,7 @@ class gun extends item{
                 rate = 20;          //180rpm
                 range = 400;
                 dispersion = 0.1f;
+                weight = 0.4f;
                 break;
         }
         shoot_ct = 0;
@@ -103,6 +109,20 @@ class gun extends item{
     }
     public void display(){
         text(type, x, y);
+        switch (type){
+            case SMG:
+                text("SMG", x, y);
+                break;
+            case AR:
+                text("AR", x, y);
+                break;
+            case SR:
+                text("SR", x, y);
+                break;
+            case HG:
+                text("HG", x, y);
+                break;
+        }
     }
 }
 class object{
@@ -171,7 +191,8 @@ class player{
         arma = new armar(4);
         main = new gun(SMG);
         facing = 0;
-        hitpoints = 100 + arma.hitpoints;
+        hitpoints = 100;
+        // hitpoints = 50;
         entity_size = 50;
     }
 
@@ -179,6 +200,7 @@ class player{
         main.display();
         update_pos();
         shoot();
+
         noStroke();
         fill(255);
         translate(-pos.x, -pos.y);
@@ -188,6 +210,46 @@ class player{
         ellipse(entity_size/2, -15, 10, 10);
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
+
+
+        stroke(0);
+        noFill();
+        rect(50, -50, -100, 10);
+        noStroke();
+        fill(255);
+        rect(50, -50, -hitpoints, 10);
+
+        // stroke(0);
+        // noFill();
+        // rect(50, -60, -100, 10);
+        // noStroke();
+        // rect(50, -60, -(hitpoints-100),10);
+        if (arma.armar_level != 0){
+            stroke(0);
+            noFill();
+            rect(-width/2+250, height/2-150, -arma.armar_level*25*2, 30);
+            switch (arma.armar_level){
+                case 1:
+                    //white
+                    fill(255);
+                    break;
+                case 2:
+                    //blue
+                    fill(0xff87CEFA);
+                    break;
+                case 3:
+                    //purple
+                    fill(0xff9370DB);
+                    break;
+                case 4:
+                    //yellow (gold)
+                    fill(0xffFFFF00);
+                    break;
+            }
+            noStroke();
+
+            rect(-width/2+250, height/2-150, -arma.hitpoints*2, 30);
+        }
     }
 
     public void shoot(){
@@ -220,7 +282,8 @@ class player{
                     break;
             }
         }
-        facing = atan2(mouseY-height/2, mouseX-width/2);
+        float facing_target = atan2(mouseY-height/2, mouseX-width/2);
+        facing += (facing_target - facing)*main.weight;
         main.shoot_ct--;
     }
 
@@ -247,8 +310,8 @@ class world{
         hoge = new item[1000];
         for (int i = 0; i < hoge.length; i++) {
             hoge[i] = new gun(i%4);
-            hoge[i].x = random(0, world_width);
-            hoge[i].y = random(0, world_height);
+            hoge[i].x = random(-world_width/2, world_width/2);
+            hoge[i].y = random(-world_width/2, world_height/2);
         }
         pl = new player();
     }
@@ -256,10 +319,6 @@ class world{
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
-
-        for (int i = 0; i < hoge.length; i++) {
-            // hoge[i].display();
-        }
 
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
@@ -272,7 +331,11 @@ class world{
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
+        for (int i = 0; i < hoge.length; i++) {
+            hoge[i].display();
+        }
         pl.display();
+        textSize(15);
     }
 }
   public void settings() {  size(1440, 810); }
