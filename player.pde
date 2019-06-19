@@ -18,11 +18,13 @@ class player{
 
     armar arma;
     gun main;
+    scope sc;
 
     player(){
         pos = new coordinate();
         arma = new armar(3);
         main = new gun(SR);
+        sc = new scope(3);
         facing = 0;
         hitpoints = 100;
         hitpoints = 50;
@@ -34,9 +36,6 @@ class player{
         update_pos();
         shoot();
         translate(-pos.x, -pos.y);
-        showHP();
-        arma.showHP();
-        showAMO();
         rotate(facing);
         strokeWeight(3);
         stroke(255, 50);
@@ -48,6 +47,11 @@ class player{
         ellipse(entity_size/2, -15, 10, 10);
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
+
+        scale(sc.magnification);
+        showHP();
+        arma.showHP();
+        showAMO();
     }
 
     void showHP(){

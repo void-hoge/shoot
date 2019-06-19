@@ -3,6 +3,19 @@ abstract public class item{
     abstract void display();
 }
 
+public class scope extends item{
+    float magnification;
+    scope(){
+        magnification = 1;
+    }
+    scope(float num){
+        magnification = num;
+    }
+    void display(){
+
+    }
+}
+
 public class armar extends item{
     int armar_level;
     float hitpoints;

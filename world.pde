@@ -17,6 +17,8 @@ class world{
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
+        scale(1/pl.sc.magnification);
+
 
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
