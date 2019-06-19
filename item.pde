@@ -1,5 +1,5 @@
 abstract public class item{
-    float x, y;
+    double x, y;
     abstract void display();
 }
 
@@ -68,7 +68,7 @@ final int HG = 3;
 class gun extends item{
     int type;
     float damage;
-    float range;
+    double range;
     int amo;
     int mag_size;       //未実装
     int rate;

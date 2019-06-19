@@ -178,6 +178,25 @@ class gun extends item{
         }
     }
 }
+class npc{
+    float x, y;
+    float hitpoints;
+    float size;
+    npc(float xx, float yy){
+        x = xx;
+        y = yy;
+        hitpoints = 100;
+        size = 30;
+    }
+
+    public void display(){
+        if (hitpoints > 0){
+            noStroke();
+            fill(255, 0, 0);
+            ellipse(x, y, size, size);
+        }
+    }
+}
 class object{
     String shape;
     coordinate point1, point2, point3;
@@ -348,6 +367,7 @@ class system{
 class world{
     player pl;
     item[] hoge;
+    npc foo;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -358,6 +378,7 @@ class world{
             hoge[i].x = random(-world_width/2, world_width/2);
             hoge[i].y = random(-world_width/2, world_height/2);
         }
+        foo = new npc(0, 0);
         pl = new player();
     }
     public void display(){
@@ -381,6 +402,7 @@ class world{
         for (int i = 0; i < hoge.length; i++) {
             hoge[i].display();
         }
+        foo.display();
         pl.display();
     }
 }
