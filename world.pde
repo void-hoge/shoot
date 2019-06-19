@@ -5,7 +5,7 @@ class world{
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new item[1000];
+        hoge = new item[200];
         for (int i = 0; i < hoge.length; i++) {
             hoge[i] = new gun(i%4);
             hoge[i].x = random(-world_width/2, world_width/2);

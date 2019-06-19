@@ -105,6 +105,7 @@ class gun extends item{
     float dispersion;
     float gap;
     float weight;
+    PImage img;
     gun(int t){
         type = t;
         switch (type){
@@ -115,6 +116,7 @@ class gun extends item{
                 range = 400;
                 dispersion = 0.2f;
                 weight = 0.15f;
+                img = loadImage("SMG.png");
                 break;
             case AR:
                 damage = 20;
@@ -123,6 +125,7 @@ class gun extends item{
                 range = 700;
                 dispersion = 0.05f;
                 weight = 0.08f;
+                img = loadImage("AR.png");
                 break;
             case SR:
                 damage = 90;
@@ -131,6 +134,7 @@ class gun extends item{
                 range = 2000;
                 dispersion = 0.01f;
                 weight = 0.03f;
+                img = loadImage("SR.png");
                 break;
             case HG:
                 damage = 15;
@@ -154,13 +158,16 @@ class gun extends item{
         text(type, x, y);
         switch (type){
             case SMG:
-                text("SMG", x, y);
+                // text("SMG", x, y);
+                image(img, x, y, 200, 100);
                 break;
             case AR:
-                text("AR", x, y);
+                // text("AR", x, y);
+                image(img, x, y, 200, 100);
                 break;
             case SR:
-                text("SR", x, y);
+                // text("SR", x, y);
+                image(img, x, y, 200, 100);
                 break;
             case HG:
                 text("HG", x, y);
@@ -338,7 +345,7 @@ class world{
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new item[1000];
+        hoge = new item[200];
         for (int i = 0; i < hoge.length; i++) {
             hoge[i] = new gun(i%4);
             hoge[i].x = random(-world_width/2, world_width/2);

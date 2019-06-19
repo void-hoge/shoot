@@ -76,6 +76,7 @@ class gun extends item{
     float dispersion;
     float gap;
     float weight;
+    PImage img;
     gun(int t){
         type = t;
         switch (type){
@@ -86,6 +87,7 @@ class gun extends item{
                 range = 400;
                 dispersion = 0.2;
                 weight = 0.15;
+                img = loadImage("SMG.png");
                 break;
             case AR:
                 damage = 20;
@@ -94,6 +96,7 @@ class gun extends item{
                 range = 700;
                 dispersion = 0.05;
                 weight = 0.08;
+                img = loadImage("AR.png");
                 break;
             case SR:
                 damage = 90;
@@ -102,6 +105,7 @@ class gun extends item{
                 range = 2000;
                 dispersion = 0.01;
                 weight = 0.03;
+                img = loadImage("SR.png");
                 break;
             case HG:
                 damage = 15;
@@ -125,13 +129,16 @@ class gun extends item{
         text(type, x, y);
         switch (type){
             case SMG:
-                text("SMG", x, y);
+                // text("SMG", x, y);
+                image(img, x, y, 200, 100);
                 break;
             case AR:
-                text("AR", x, y);
+                // text("AR", x, y);
+                image(img, x, y, 200, 100);
                 break;
             case SR:
-                text("SR", x, y);
+                // text("SR", x, y);
+                image(img, x, y, 200, 100);
                 break;
             case HG:
                 text("HG", x, y);
