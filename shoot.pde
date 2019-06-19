@@ -1,9 +1,11 @@
 system sys;
+int moving_vec;
 
 void setup(){
     size(1440, 810);
     sys = new system();
-    frameRate(60);
+    moving_vec = 0;
+    frameRate(120);
 }
 
 void draw(){

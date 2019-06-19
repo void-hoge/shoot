@@ -15,11 +15,13 @@ import java.io.IOException;
 public class shoot extends PApplet {
 
 system sys;
+int moving_vec;
 
 public void setup(){
     
     sys = new system();
-    frameRate(60);
+    moving_vec = 0;
+    frameRate(120);
 }
 
 public void draw(){
@@ -143,6 +145,7 @@ class gun extends item{
                 range = 400;
                 dispersion = 0.1f;
                 weight = 0.4f;
+                img = loadImage("HG.png");
                 break;
         }
         shoot_ct = 0;
@@ -155,7 +158,6 @@ class gun extends item{
     }
     public void display(){
         textSize(10);
-        text(type, x, y);
         switch (type){
             case SMG:
                 // text("SMG", x, y);
@@ -170,7 +172,8 @@ class gun extends item{
                 image(img, x, y, 200, 100);
                 break;
             case HG:
-                text("HG", x, y);
+                // text("HG", x, y);
+                image(img, x, y, 200, 100);
                 break;
         }
     }
@@ -232,6 +235,7 @@ class player{
     float facing;
     float hitpoints;
     int entity_size;    // radius
+    // int moving_vec;     //0b(up)(down)(left)(right)
 
     armar arma;
     gun main;
@@ -240,12 +244,13 @@ class player{
     player(){
         pos = new coordinate();
         arma = new armar(3);
-        main = new gun(SR);
-        sc = new scope(3);
+        main = new gun(AR);
+        sc = new scope(2);
         facing = 0;
         hitpoints = 100;
         hitpoints = 50;
         entity_size = 50;
+        moving_vec = 0;
     }
 
     public void display(){
@@ -289,11 +294,13 @@ class player{
 
     public void shoot(){
         if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
-            translate(0, 0);
-            PVector mouse = new PVector(mouseX-width/2-pos.x, mouseY-height/2-pos.y);
-            stroke(255, 212, 0);
+            translate(-pos.x, -pos.y);
+            rotate(facing+main.gap);
             strokeWeight(4);
-            line(-pos.x, -pos.y, cos(facing+main.gap)*main.range-pos.x, sin(facing+main.gap)*main.range-pos.y);
+            stroke(255, 212, 0);
+            line(0,0, main.range, 0);
+            rotate(-(facing+main.gap));
+            translate(pos.x, pos.y);
             main.shoot_ct = main.rate;
             main.set_gap();
             main.amo--;
@@ -345,7 +352,7 @@ class world{
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new item[200];
+        hoge = new item[100];
         for (int i = 0; i < hoge.length; i++) {
             hoge[i] = new gun(i%4);
             hoge[i].x = random(-world_width/2, world_width/2);

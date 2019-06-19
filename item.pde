@@ -114,6 +114,7 @@ class gun extends item{
                 range = 400;
                 dispersion = 0.1;
                 weight = 0.4;
+                img = loadImage("HG.png");
                 break;
         }
         shoot_ct = 0;
@@ -126,7 +127,6 @@ class gun extends item{
     }
     void display(){
         textSize(10);
-        text(type, x, y);
         switch (type){
             case SMG:
                 // text("SMG", x, y);
@@ -141,7 +141,8 @@ class gun extends item{
                 image(img, x, y, 200, 100);
                 break;
             case HG:
-                text("HG", x, y);
+                // text("HG", x, y);
+                image(img, x, y, 200, 100);
                 break;
         }
     }
