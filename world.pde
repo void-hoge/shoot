@@ -2,7 +2,7 @@ class world{
     player pl;
     item[] hoge;
     npc foo;
-    double world_width, world_height;
+    float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
@@ -21,21 +21,21 @@ class world{
         background(59, 175, 117);
         scale(1/pl.sc.magnification);
 
-
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
-        for (double i = 0; i < world_width/2; i+=100){
+        for (float i = 0; i < world_width/2; i+=100){
             line(i, 25, i, -25);
             line(-i, 25, -i, -25);
         }
         line(0, world_height/2, 0, -world_height/2);
-        for (double i = 0; i < world_height/2; i+=100){
+        for (float i = 0; i < world_height/2; i+=100){
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
         for (int i = 0; i < hoge.length; i++) {
             hoge[i].display();
         }
+
         foo.display();
         pl.display();
     }

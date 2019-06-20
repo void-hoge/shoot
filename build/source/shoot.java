@@ -21,7 +21,7 @@ public void setup(){
     
     sys = new system();
     moving_vec = 0;
-    frameRate(120);
+    frameRate(60);
 }
 
 public void draw(){
@@ -387,7 +387,6 @@ class world{
         background(59, 175, 117);
         scale(1/pl.sc.magnification);
 
-
         translate(pl.get_pos().x, pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
         for (float i = 0; i < world_width/2; i+=100){
@@ -402,6 +401,7 @@ class world{
         for (int i = 0; i < hoge.length; i++) {
             hoge[i].display();
         }
+
         foo.display();
         pl.display();
     }

@@ -1,5 +1,5 @@
 class npc{
-    double x, y;
+    float x, y;
     float hitpoints;
     float size;
     npc(float xx, float yy){

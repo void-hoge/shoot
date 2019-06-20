@@ -1,5 +1,5 @@
 class coordinate{
-    double x, y;
+    float x, y;
     coordinate(){
         x = 0;
         y = 0;

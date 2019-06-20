@@ -5,7 +5,7 @@ void setup(){
     size(1440, 810);
     sys = new system();
     moving_vec = 0;
-    frameRate(120);
+    frameRate(60);
 }
 
 void draw(){
