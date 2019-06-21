@@ -1,7 +1,7 @@
-abstract public class item{
+class item{
     float x, y;
     int type_of_item;
-    abstract void display();
+    void display();
 }
 
 final int NONE = 0;
@@ -136,7 +136,6 @@ class gun extends item{
         gap = random(-dispersion, dispersion);
     }
     void display(){
-        textSize(10);
         switch (type){
             case SMG:
                 // text("SMG", x, y);

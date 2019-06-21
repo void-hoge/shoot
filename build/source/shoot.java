@@ -29,10 +29,10 @@ public void draw(){
     textAlign(CENTER);
     sys.display();
 }
-abstract public class item{
+class item{
     float x, y;
     int type_of_item;
-    public abstract void display();
+    public void display();
 }
 
 final int NONE = 0;
@@ -167,7 +167,6 @@ class gun extends item{
         gap = random(-dispersion, dispersion);
     }
     public void display(){
-        textSize(10);
         switch (type){
             case SMG:
                 // text("SMG", x, y);
@@ -288,9 +287,9 @@ class player{
     int entity_size;    // radius
     // int moving_vec;     //0b(up)(down)(left)(right)
 
-    armar arma;
-    gun main;
-    scope sc;
+    private item arma;
+    private item main;
+    private item sc;
 
     npc[] enemy;
     item[] item_list;
@@ -326,12 +325,11 @@ class player{
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
 
-        scale(sc.magnification);
+        scale(sc[0].magnification);
         showHP();
         arma.showHP();
         showAMO();
         translate(-pos.x, -pos.y);
-
     }
 
     public void showHP(){
@@ -347,11 +345,11 @@ class player{
     public void showAMO(){
         fill(0);
         textSize(40);
-        text(main.amo, width/2-100, height/2-100);
+        text(main[0].amo, width/2-100, height/2-100);
     }
 
     public void shoot(){
-        if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
+        if (mousePressed&&(main[0].shoot_ct <= 0)&&(main[0].amo > 0)){
             //display line
             translate(pos.x, pos.y);
             rotate(facing+main.gap);
@@ -403,8 +401,8 @@ class player{
         if(abs(facing_target-facing) > radians(180)){
             facing_target+=radians(360);
         }
-        facing += (facing_target - facing)*main.weight;
-        main.shoot_ct--;
+        facing += (facing_target - facing)*main[0].weight;
+        main[0].shoot_ct--;
     }
 
     public void pickup(){
@@ -422,16 +420,7 @@ class player{
                 if (kouho.num == 2147483647){
                     return;
                 }else{
-                    switch (item_list[kouho.num].type_of_item){
-                        case GUN:
-                            // main = item_list[kouho.num];
-                            break;
-                        case SCOPE:
-                            // sc = item_list[kouho.num];
-                            break;
-                        case ARMAR:
-                            // arma = item_list[kouho.num];
-                    }
+                    main = item_list[kouho.num];
                 }
             }
         }
