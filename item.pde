@@ -1,27 +1,36 @@
 abstract public class item{
     float x, y;
+    int type_of_item;
     abstract void display();
 }
 
-public class scope extends item{
+final int NONE = 0;
+final int SCOPE = 1;
+final int ARMAR = 2;
+final int GUN = 3;
+
+class scope extends item{
     float magnification;
     scope(){
         magnification = 1;
+        type_of_item = SCOPE;
     }
     scope(float num){
         magnification = num;
+        type_of_item = SCOPE;
     }
     void display(){
 
     }
 }
 
-public class armar extends item{
+class armar extends item{
     int armar_level;
     float hitpoints;
     armar(int level){
         armar_level = level;
         hitpoints = armar_level*25;
+        type_of_item = ARMAR;
     }
     float get_hitpoints(){
         return hitpoints;
@@ -79,6 +88,7 @@ class gun extends item{
     PImage img;
     gun(int t){
         type = t;
+        type_of_item = GUN;
         switch (type){
             case SMG:
                 damage = 10;

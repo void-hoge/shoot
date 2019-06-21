@@ -1,7 +1,7 @@
 class world{
     player pl;
     item[] hoge;
-    npc foo;
+    npc[] foo;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -12,8 +12,11 @@ class world{
             hoge[i].x = random(-world_width/2, world_width/2);
             hoge[i].y = random(-world_width/2, world_height/2);
         }
-        foo = new npc(0, 0);
-        pl = new player();
+        foo = new npc[10];
+        for (int i = 0; i < foo.length; i++){
+            foo[i] = new npc(random(-1000,1000), random(-1000,1000));
+        }
+        pl = new player(foo, hoge);
     }
     void display(){
         stroke(0);
@@ -21,7 +24,7 @@ class world{
         background(59, 175, 117);
         scale(1/pl.sc.magnification);
 
-        translate(pl.get_pos().x, pl.get_pos().y);
+        translate(-pl.get_pos().x, -pl.get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
         for (float i = 0; i < world_width/2; i+=100){
             line(i, 25, i, -25);
@@ -35,8 +38,9 @@ class world{
         for (int i = 0; i < hoge.length; i++) {
             hoge[i].display();
         }
-
-        foo.display();
+        for (int i = 0; i < foo.length; i++) {
+            foo[i].display();
+        }
         pl.display();
     }
 }

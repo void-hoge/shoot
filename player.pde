@@ -10,6 +10,19 @@ class coordinate{
     }
 }
 
+class num_and_dist{
+    int num;
+    float distance;
+    num_and_dist(){
+        num = 0;
+        distance = 0;
+    }
+    num_and_dist(int nnum, float ddistance){
+        num = nnum;
+        distance = ddistance;
+    }
+}
+
 class player{
     coordinate pos;
     float facing;
@@ -21,23 +34,28 @@ class player{
     gun main;
     scope sc;
 
-    player(){
+    npc[] enemy;
+    item[] item_list;
+
+    player(npc[] hoge, item[] poyo){
         pos = new coordinate();
         arma = new armar(3);
-        main = new gun(AR);
+        main = new gun(SMG);
         sc = new scope(2);
         facing = 0;
         hitpoints = 100;
         hitpoints = 50;
         entity_size = 50;
         moving_vec = 0;
+        enemy = hoge;
+        item_list = poyo;
     }
 
     void display(){
         main.display();
         update_pos();
         shoot();
-        translate(-pos.x, -pos.y);
+        translate(pos.x, pos.y);
         rotate(facing);
         strokeWeight(3);
         stroke(255, 50);
@@ -54,6 +72,8 @@ class player{
         showHP();
         arma.showHP();
         showAMO();
+        translate(-pos.x, -pos.y);
+
     }
 
     void showHP(){
@@ -74,13 +94,30 @@ class player{
 
     void shoot(){
         if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
-            translate(-pos.x, -pos.y);
+            //display line
+            translate(pos.x, pos.y);
             rotate(facing+main.gap);
-            strokeWeight(4);
+            strokeWeight(3);
             stroke(255, 212, 0);
             line(0,0, main.range, 0);
             rotate(-(facing+main.gap));
-            translate(pos.x, pos.y);
+            translate(-pos.x, -pos.y);
+
+            //culcurate hits
+            coordinate end;
+            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));//unit vector
+            end.x*=main.range;
+            end.x+=pos.x;
+            end.y*=main.range;
+            end.y+=pos.y;
+            for (int i = 0; i < enemy.length; i++){
+                if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].x, enemy[i].y)){
+                    if(abs((pos.y-end.y)*enemy[i].x-(pos.x-end.x)*enemy[i].y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
+                        enemy[i].hitpoints -= main.damage;
+                    }
+                }
+            }
+
             main.shoot_ct = main.rate;
             main.set_gap();
             main.amo--;
@@ -91,16 +128,16 @@ class player{
         if (keyPressed == true){
             switch (key){
                 case 'w':
-                    pos.y+=3.0;
-                    break;
-                case 's':
                     pos.y-=3.0;
                     break;
+                case 's':
+                    pos.y+=3.0;
+                    break;
                 case 'a':
-                    pos.x+=3.0;
+                    pos.x-=3.0;
                     break;
                 case 'd':
-                    pos.x-=3.0;
+                    pos.x+=3.0;
                     break;
             }
         }
@@ -110,6 +147,36 @@ class player{
         }
         facing += (facing_target - facing)*main.weight;
         main.shoot_ct--;
+    }
+
+    void pickup(){
+        if (keyPressed == true){
+            if(key == 'e'){
+                num_and_dist kouho = new num_and_dist(2147483647, 1000000);
+                for (int i = 0; i < item_list.length; i++){
+                    if (70>dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
+                        if(kouho.distance > dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
+                            kouho.num = i;
+                            kouho.distance = dist(pos.x, pos.y, item_list[i].x, item_list[i].y);
+                        }
+                    }
+                }
+                if (kouho.num == 2147483647){
+                    return;
+                }else{
+                    switch (item_list[kouho.num].type_of_item){
+                        case GUN:
+                            // main = item_list[kouho.num];
+                            break;
+                        case SCOPE:
+                            // sc = item_list[kouho.num];
+                            break;
+                        case ARMAR:
+                            // arma = item_list[kouho.num];
+                    }
+                }
+            }
+        }
     }
 
     coordinate get_pos(){
