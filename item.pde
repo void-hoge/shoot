@@ -1,7 +1,7 @@
-class item{
+abstract class item{
     float x, y;
     int type_of_item;
-    void display();
+    abstract void display();
 }
 
 final int NONE = 0;

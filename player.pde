@@ -30,9 +30,9 @@ class player{
     int entity_size;    // radius
     // int moving_vec;     //0b(up)(down)(left)(right)
 
-    private item arma;
-    private item main;
-    private item sc;
+    private armar arma;
+    private gun main;
+    private scope sc;
 
     npc[] enemy;
     item[] item_list;
@@ -40,7 +40,7 @@ class player{
     player(npc[] hoge, item[] poyo){
         pos = new coordinate();
         arma = new armar(3);
-        main = new gun(SMG);
+        main = new gun(AR);
         sc = new scope(2);
         facing = 0;
         hitpoints = 100;
@@ -68,7 +68,7 @@ class player{
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
 
-        scale(sc[0].magnification);
+        scale(sc.magnification);
         showHP();
         arma.showHP();
         showAMO();
@@ -88,11 +88,11 @@ class player{
     void showAMO(){
         fill(0);
         textSize(40);
-        text(main[0].amo, width/2-100, height/2-100);
+        text(main.amo, width/2-100, height/2-100);
     }
 
     void shoot(){
-        if (mousePressed&&(main[0].shoot_ct <= 0)&&(main[0].amo > 0)){
+        if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
             translate(pos.x, pos.y);
             rotate(facing+main.gap);
@@ -144,8 +144,8 @@ class player{
         if(abs(facing_target-facing) > radians(180)){
             facing_target+=radians(360);
         }
-        facing += (facing_target - facing)*main[0].weight;
-        main[0].shoot_ct--;
+        facing += (facing_target - facing)*main.weight;
+        main.shoot_ct--;
     }
 
     void pickup(){
@@ -163,7 +163,7 @@ class player{
                 if (kouho.num == 2147483647){
                     return;
                 }else{
-                    main = item_list[kouho.num];
+                    // main = item_list[kouho.num];
                 }
             }
         }
