@@ -35,18 +35,20 @@ class player{
     private scope sc;
 
     npc[] enemy;
-    item[] item_list;
+    gun[] item_list;
 
-    player(npc[] hoge, item[] poyo){
+    player(npc[] hoge, gun[] poyo){
         pos = new coordinate();
         arma = new armar(3);
+        arma.is_show = false;
         main = new gun(AR);
+        main.is_show = false;
         sc = new scope(2);
+        sc.is_show = false;
         facing = 0;
         hitpoints = 100;
         hitpoints = 50;
         entity_size = 50;
-        moving_vec = 0;
         enemy = hoge;
         item_list = poyo;
     }
@@ -73,6 +75,7 @@ class player{
         arma.showHP();
         showAMO();
         translate(-pos.x, -pos.y);
+        pickup();
     }
 
     void showHP(){
@@ -153,7 +156,7 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < item_list.length; i++){
-                    if (70>dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
+                    if (50>dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
                         if(kouho.distance > dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
                             kouho.num = i;
                             kouho.distance = dist(pos.x, pos.y, item_list[i].x, item_list[i].y);
@@ -163,7 +166,21 @@ class player{
                 if (kouho.num == 2147483647){
                     return;
                 }else{
-                    // main = item_list[kouho.num];
+                    gun sw = main;
+                    main = item_list[kouho.num];
+                    main.is_show = false;
+                    item_list[kouho.num] = sw;
+                    item_list[kouho.num].is_show = true;
+                    if ((int(random(10000))&1) == 0){
+                        item_list[kouho.num].x = pos.x +100 + random(-20,20);
+                    }else{
+                        item_list[kouho.num].x = pos.x -100 + random(-20,20);
+                    }
+                    if ((int(random(10000))&1) == 0){
+                        item_list[kouho.num].y = pos.y +100 + random(-20,20);
+                    }else{
+                        item_list[kouho.num].y = pos.x -100 + random(-20,20);
+                    }
                 }
             }
         }

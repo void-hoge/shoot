@@ -1,26 +1,28 @@
 abstract class item{
     float x, y;
-    int type_of_item;
+    boolean is_show;
     abstract void display();
 }
 
-final int NONE = 0;
-final int SCOPE = 1;
-final int ARMAR = 2;
-final int GUN = 3;
+// final int NONE = 0;
+// final int SCOPE = 1;
+// final int ARMAR = 2;
+// final int GUN = 3;
 
 class scope extends item{
     float magnification;
     scope(){
+        is_show = true;
         magnification = 1;
-        type_of_item = SCOPE;
     }
     scope(float num){
+        is_show = true;
         magnification = num;
-        type_of_item = SCOPE;
     }
     void display(){
+        if (is_show){
 
+        }
     }
 }
 
@@ -30,13 +32,15 @@ class armar extends item{
     armar(int level){
         armar_level = level;
         hitpoints = armar_level*25;
-        type_of_item = ARMAR;
+        is_show = true;
     }
     float get_hitpoints(){
         return hitpoints;
     }
     void display(){
-        text(armar_level, x, y);
+        if (is_show){
+            text(armar_level, x, y);
+        }
     }
     void showHP(){
         if (armar_level != 0){
@@ -88,7 +92,7 @@ class gun extends item{
     PImage img;
     gun(int t){
         type = t;
-        type_of_item = GUN;
+        is_show = true;
         switch (type){
             case SMG:
                 damage = 10;
@@ -136,23 +140,22 @@ class gun extends item{
         gap = random(-dispersion, dispersion);
     }
     void display(){
-        switch (type){
-            case SMG:
-                // text("SMG", x, y);
-                image(img, x, y, 200, 100);
-                break;
-            case AR:
-                // text("AR", x, y);
-                image(img, x, y, 200, 100);
-                break;
-            case SR:
-                // text("SR", x, y);
-                image(img, x, y, 200, 100);
-                break;
-            case HG:
-                // text("HG", x, y);
-                image(img, x, y, 200, 100);
-                break;
+        if (is_show){
+            imageMode(CENTER);
+            switch (type){
+                case SMG:
+                    image(img, x, y, 200, 100);
+                    break;
+                case AR:
+                    image(img, x, y, 200, 100);
+                    break;
+                case SR:
+                    image(img, x, y, 200, 100);
+                    break;
+                case HG:
+                    image(img, x, y, 200, 100);
+                    break;
+            }
         }
     }
 }

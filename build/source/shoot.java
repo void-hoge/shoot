@@ -15,12 +15,10 @@ import java.io.IOException;
 public class shoot extends PApplet {
 
 system sys;
-int moving_vec;
 
 public void setup(){
     
     sys = new system();
-    moving_vec = 0;
     frameRate(60);
 }
 
@@ -31,27 +29,29 @@ public void draw(){
 }
 abstract class item{
     float x, y;
-    int type_of_item;
+    boolean is_show;
     public abstract void display();
 }
 
-final int NONE = 0;
-final int SCOPE = 1;
-final int ARMAR = 2;
-final int GUN = 3;
+// final int NONE = 0;
+// final int SCOPE = 1;
+// final int ARMAR = 2;
+// final int GUN = 3;
 
 class scope extends item{
     float magnification;
     scope(){
+        is_show = true;
         magnification = 1;
-        type_of_item = SCOPE;
     }
     scope(float num){
+        is_show = true;
         magnification = num;
-        type_of_item = SCOPE;
     }
     public void display(){
+        if (is_show){
 
+        }
     }
 }
 
@@ -61,13 +61,15 @@ class armar extends item{
     armar(int level){
         armar_level = level;
         hitpoints = armar_level*25;
-        type_of_item = ARMAR;
+        is_show = true;
     }
     public float get_hitpoints(){
         return hitpoints;
     }
     public void display(){
-        text(armar_level, x, y);
+        if (is_show){
+            text(armar_level, x, y);
+        }
     }
     public void showHP(){
         if (armar_level != 0){
@@ -119,7 +121,7 @@ class gun extends item{
     PImage img;
     gun(int t){
         type = t;
-        type_of_item = GUN;
+        is_show = true;
         switch (type){
             case SMG:
                 damage = 10;
@@ -167,23 +169,22 @@ class gun extends item{
         gap = random(-dispersion, dispersion);
     }
     public void display(){
-        switch (type){
-            case SMG:
-                // text("SMG", x, y);
-                image(img, x, y, 200, 100);
-                break;
-            case AR:
-                // text("AR", x, y);
-                image(img, x, y, 200, 100);
-                break;
-            case SR:
-                // text("SR", x, y);
-                image(img, x, y, 200, 100);
-                break;
-            case HG:
-                // text("HG", x, y);
-                image(img, x, y, 200, 100);
-                break;
+        if (is_show){
+            imageMode(CENTER);
+            switch (type){
+                case SMG:
+                    image(img, x, y, 200, 100);
+                    break;
+                case AR:
+                    image(img, x, y, 200, 100);
+                    break;
+                case SR:
+                    image(img, x, y, 200, 100);
+                    break;
+                case HG:
+                    image(img, x, y, 200, 100);
+                    break;
+            }
         }
     }
 }
@@ -292,18 +293,20 @@ class player{
     private scope sc;
 
     npc[] enemy;
-    item[] item_list;
+    gun[] item_list;
 
-    player(npc[] hoge, item[] poyo){
+    player(npc[] hoge, gun[] poyo){
         pos = new coordinate();
         arma = new armar(3);
+        arma.is_show = false;
         main = new gun(AR);
+        main.is_show = false;
         sc = new scope(2);
+        sc.is_show = false;
         facing = 0;
         hitpoints = 100;
         hitpoints = 50;
         entity_size = 50;
-        moving_vec = 0;
         enemy = hoge;
         item_list = poyo;
     }
@@ -330,6 +333,7 @@ class player{
         arma.showHP();
         showAMO();
         translate(-pos.x, -pos.y);
+        pickup();
     }
 
     public void showHP(){
@@ -410,7 +414,7 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < item_list.length; i++){
-                    if (70>dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
+                    if (50>dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
                         if(kouho.distance > dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
                             kouho.num = i;
                             kouho.distance = dist(pos.x, pos.y, item_list[i].x, item_list[i].y);
@@ -420,7 +424,21 @@ class player{
                 if (kouho.num == 2147483647){
                     return;
                 }else{
-                    // main = item_list[kouho.num];
+                    gun sw = main;
+                    main = item_list[kouho.num];
+                    main.is_show = false;
+                    item_list[kouho.num] = sw;
+                    item_list[kouho.num].is_show = true;
+                    if ((PApplet.parseInt(random(10000))&1) == 0){
+                        item_list[kouho.num].x = pos.x +100 + random(-20,20);
+                    }else{
+                        item_list[kouho.num].x = pos.x -100 + random(-20,20);
+                    }
+                    if ((PApplet.parseInt(random(10000))&1) == 0){
+                        item_list[kouho.num].y = pos.y +100 + random(-20,20);
+                    }else{
+                        item_list[kouho.num].y = pos.x -100 + random(-20,20);
+                    }
                 }
             }
         }
@@ -441,13 +459,13 @@ class system{
 }
 class world{
     player pl;
-    item[] hoge;
+    gun[] hoge;
     npc[] foo;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new item[100];
+        hoge = new gun[100];
         for (int i = 0; i < hoge.length; i++) {
             hoge[i] = new gun(i%4);
             hoge[i].x = random(-world_width/2, world_width/2);
