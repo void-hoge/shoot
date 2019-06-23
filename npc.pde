@@ -6,7 +6,7 @@ class npc{
         x = xx;
         y = yy;
         hitpoints = 100;
-        entity_size = 30;
+        entity_size = 50;
     }
 
     npc(){

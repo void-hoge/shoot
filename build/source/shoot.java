@@ -55,6 +55,33 @@ class scope extends item{
     }
 }
 
+class amo extends item{
+    int amo;
+    amo(){
+        is_show = false;
+        amo = 100;
+    }
+    public void display(){}
+}
+
+class heal extends item{
+    float hitpoints;
+    heal(){
+        is_show = false;
+        hitpoints = 50;
+    }
+    public void display(){}
+}
+
+class charge extends item{
+    float hitpoints;
+    charge(){
+        is_show = false;
+        hitpoints = 50;
+    }
+    public void display(){}
+}
+
 class armar extends item{
     int armar_level;
     float hitpoints;
@@ -196,7 +223,7 @@ class npc{
         x = xx;
         y = yy;
         hitpoints = 100;
-        entity_size = 30;
+        entity_size = 50;
     }
 
     npc(){
@@ -459,14 +486,17 @@ class system{
 }
 class world{
     player pl;
+    // ArrayList<gun> hoge;
     gun[] hoge;
     npc[] foo;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new gun[100];
-        for (int i = 0; i < hoge.length; i++) {
+        hoge = new gun[50];
+        // hoge = new ArrayList<gun>();
+        gun bar;
+        for (int i = 0; i < 50; i++) {
             hoge[i] = new gun(i%4);
             hoge[i].x = random(-world_width/2, world_width/2);
             hoge[i].y = random(-world_width/2, world_height/2);

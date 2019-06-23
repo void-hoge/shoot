@@ -26,6 +26,33 @@ class scope extends item{
     }
 }
 
+class amo extends item{
+    int amo;
+    amo(){
+        is_show = false;
+        amo = 100;
+    }
+    void display(){}
+}
+
+class heal extends item{
+    float hitpoints;
+    heal(){
+        is_show = false;
+        hitpoints = 50;
+    }
+    void display(){}
+}
+
+class charge extends item{
+    float hitpoints;
+    charge(){
+        is_show = false;
+        hitpoints = 50;
+    }
+    void display(){}
+}
+
 class armar extends item{
     int armar_level;
     float hitpoints;

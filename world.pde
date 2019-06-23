@@ -1,13 +1,16 @@
 class world{
     player pl;
+    // ArrayList<gun> hoge;
     gun[] hoge;
     npc[] foo;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new gun[100];
-        for (int i = 0; i < hoge.length; i++) {
+        hoge = new gun[50];
+        // hoge = new ArrayList<gun>();
+        gun bar;
+        for (int i = 0; i < 50; i++) {
             hoge[i] = new gun(i%4);
             hoge[i].x = random(-world_width/2, world_width/2);
             hoge[i].y = random(-world_width/2, world_height/2);
