@@ -39,7 +39,7 @@ class player{
 
     player(npc[] hoge, gun[] poyo){
         pos = new coordinate();
-        arma = new armar(3);
+        arma = new armar(4);
         arma.is_show = false;
         main = new gun(AR);
         main.is_show = false;
@@ -47,13 +47,17 @@ class player{
         sc.is_show = false;
         facing = 0;
         hitpoints = 100;
-        hitpoints = 50;
         entity_size = 50;
         enemy = hoge;
         item_list = poyo;
     }
 
     void display(){
+        if (hitpoints == 0){
+            textSize(100);
+            text("You dead", pos.x, pos.y);
+            return;
+        }
         main.display();
         update_pos();
         shoot();
@@ -72,13 +76,13 @@ class player{
 
         scale(sc.magnification);
         showHP();
-        arma.showHP();
         showAMO();
         translate(-pos.x, -pos.y);
         pickup();
     }
 
     void showHP(){
+        arma.showHP();
         strokeWeight(1);
         stroke(0);
         noFill();
@@ -113,8 +117,8 @@ class player{
             end.y*=main.range;
             end.y+=pos.y;
             for (int i = 0; i < enemy.length; i++){
-                if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].x, enemy[i].y)){
-                    if(abs((pos.y-end.y)*enemy[i].x-(pos.x-end.x)*enemy[i].y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
+                if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].pos.x, enemy[i].pos.y)){
+                    if(abs((pos.y-end.y)*enemy[i].pos.x-(pos.x-end.x)*enemy[i].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
                         enemy[i].hitpoints -= main.damage;
                     }
                 }
@@ -148,7 +152,6 @@ class player{
             facing_target+=radians(360);
         }
         facing += (facing_target - facing)*main.weight;
-        main.shoot_ct--;
     }
 
     void pickup(){
@@ -184,9 +187,25 @@ class player{
                 }
             }
         }
+        main.shoot_ct--;
     }
 
     coordinate get_pos(){
         return pos;
+    }
+
+    void decrease_hitpoint(float points){
+        if (arma.hitpoints > 0){
+            arma.hitpoints -= points;
+            if (arma.hitpoints < 0){
+                points = -arma.hitpoints;
+                arma.hitpoints = 0;
+            }
+        }else{
+            hitpoints -= points;
+        }
+        if (hitpoints < 0){
+            hitpoints = 0;
+        }
     }
 }

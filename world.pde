@@ -1,33 +1,36 @@
 class world{
-    player pl;
-    // ArrayList<gun> hoge;
-    gun[] hoge;
-    npc[] foo;
+    player[] player_list;
+    gun[] gun_list;
+    npc[] npc_list;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new gun[50];
-        // hoge = new ArrayList<gun>();
+        gun_list = new gun[10];
         gun bar;
-        for (int i = 0; i < 50; i++) {
-            hoge[i] = new gun(i%4);
-            hoge[i].x = random(-world_width/2, world_width/2);
-            hoge[i].y = random(-world_width/2, world_height/2);
+        for (int i = 0; i < gun_list.length; i++) {
+            gun_list[i] = new gun(i%4);
+            gun_list[i].x = random(-world_width/2, world_width/2);
+            gun_list[i].y = random(-world_width/2, world_height/2);
         }
-        foo = new npc[10];
-        for (int i = 0; i < foo.length; i++){
-            foo[i] = new npc(random(-1000,1000), random(-1000,1000));
+        npc_list = new npc[5];
+        for (int i = 0; i < npc_list.length; i++){
+            npc_list[i] = new npc(random(-1000,1000), random(-1000,1000));
         }
-        pl = new player(foo, hoge);
+        player_list = new player[1];
+        player pl = new player(npc_list, gun_list);
+        player_list[0] = pl;
+        for (int i = 0; i < npc_list.length; i++){
+            npc_list[i].set_terget(player_list);
+        }
     }
     void display(){
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
-        scale(1/pl.sc.magnification);
+        scale(1/player_list[0].sc.magnification);
 
-        translate(-pl.get_pos().x, -pl.get_pos().y);
+        translate(-player_list[0].get_pos().x, -player_list[0].get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
         for (float i = 0; i < world_width/2; i+=100){
             line(i, 25, i, -25);
@@ -38,12 +41,12 @@ class world{
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
-        for (int i = 0; i < hoge.length; i++) {
-            hoge[i].display();
+        for (int i = 0; i < gun_list.length; i++) {
+            gun_list[i].display();
         }
-        for (int i = 0; i < foo.length; i++) {
-            foo[i].display();
+        for (int i = 0; i < npc_list.length; i++) {
+            npc_list[i].display();
         }
-        pl.display();
+        player_list[0].display();
     }
 }

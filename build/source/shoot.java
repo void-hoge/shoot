@@ -216,30 +216,77 @@ class gun extends item{
     }
 }
 class npc{
-    float x, y;
+    coordinate pos;
     float hitpoints;
     float entity_size;
+    float facing;
+    player[] target;
+    gun main;
+
     npc(float xx, float yy){
-        x = xx;
-        y = yy;
+        pos = new coordinate(xx, yy);
+        pos.x = xx;
+        pos.y = yy;
+        main = new gun(HG);
         hitpoints = 100;
         entity_size = 50;
+        facing = 0;
+    }
+
+    public void set_terget(player[] pl){
+        target = pl;
     }
 
     npc(){
-        x = 0;
-        y = 0;
+        pos.x = 0;
+        pos.y = 0;
         hitpoints = 100;
         entity_size = 30;
+        facing = 0;
+    }
+
+    public void shoot(){
+        if(target[0].hitpoints == 0){
+            return;
+        }
+        if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
+            //display line
+            facing= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            translate(pos.x, pos.y);
+            rotate(facing+main.gap);
+            strokeWeight(3);
+            stroke(255, 212, 0);
+            line(0,0, main.range, 0);
+            rotate(-(facing+main.gap));
+            translate(-pos.x, -pos.y);
+
+            //culcurate hits
+            coordinate end;
+            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));//unit vector
+            end.x*=main.range;
+            end.x+=pos.x;
+            end.y*=main.range;
+            end.y+=pos.y;
+            if (main.range+target[0].entity_size > dist(pos.x, pos.y, target[0].pos.x, target[0].pos.y)){
+                if(abs((pos.y-end.y)*target[0].pos.x-(pos.x-end.x)*target[0].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < target[0].entity_size){
+                    target[0].decrease_hitpoint(main.damage);
+                }
+            }
+            main.shoot_ct = main.rate;
+            main.set_gap();
+            main.amo--;
+        }
+        main.shoot_ct--;
     }
 
     public void display(){
         if (hitpoints > 0){
             noStroke();
             fill(255, 0, 0);
-            ellipse(x, y, entity_size, entity_size);
+            ellipse(pos.x, pos.y, entity_size, entity_size);
             textSize(20);
-            text(hitpoints, x, y);
+            text(hitpoints, pos.x, pos.y);
+            shoot();
         }
     }
 }
@@ -324,7 +371,7 @@ class player{
 
     player(npc[] hoge, gun[] poyo){
         pos = new coordinate();
-        arma = new armar(3);
+        arma = new armar(4);
         arma.is_show = false;
         main = new gun(AR);
         main.is_show = false;
@@ -332,13 +379,17 @@ class player{
         sc.is_show = false;
         facing = 0;
         hitpoints = 100;
-        hitpoints = 50;
         entity_size = 50;
         enemy = hoge;
         item_list = poyo;
     }
 
     public void display(){
+        if (hitpoints == 0){
+            textSize(100);
+            text("You dead", pos.x, pos.y);
+            return;
+        }
         main.display();
         update_pos();
         shoot();
@@ -357,13 +408,13 @@ class player{
 
         scale(sc.magnification);
         showHP();
-        arma.showHP();
         showAMO();
         translate(-pos.x, -pos.y);
         pickup();
     }
 
     public void showHP(){
+        arma.showHP();
         strokeWeight(1);
         stroke(0);
         noFill();
@@ -398,8 +449,8 @@ class player{
             end.y*=main.range;
             end.y+=pos.y;
             for (int i = 0; i < enemy.length; i++){
-                if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].x, enemy[i].y)){
-                    if(abs((pos.y-end.y)*enemy[i].x-(pos.x-end.x)*enemy[i].y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
+                if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].pos.x, enemy[i].pos.y)){
+                    if(abs((pos.y-end.y)*enemy[i].pos.x-(pos.x-end.x)*enemy[i].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
                         enemy[i].hitpoints -= main.damage;
                     }
                 }
@@ -433,7 +484,6 @@ class player{
             facing_target+=radians(360);
         }
         facing += (facing_target - facing)*main.weight;
-        main.shoot_ct--;
     }
 
     public void pickup(){
@@ -469,10 +519,26 @@ class player{
                 }
             }
         }
+        main.shoot_ct--;
     }
 
     public coordinate get_pos(){
         return pos;
+    }
+
+    public void decrease_hitpoint(float points){
+        if (arma.hitpoints > 0){
+            arma.hitpoints -= points;
+            if (arma.hitpoints < 0){
+                points = -arma.hitpoints;
+                arma.hitpoints = 0;
+            }
+        }else{
+            hitpoints -= points;
+        }
+        if (hitpoints < 0){
+            hitpoints = 0;
+        }
     }
 }
 class system{
@@ -485,35 +551,38 @@ class system{
     }
 }
 class world{
-    player pl;
-    // ArrayList<gun> hoge;
-    gun[] hoge;
-    npc[] foo;
+    player[] player_list;
+    gun[] gun_list;
+    npc[] npc_list;
     float world_width, world_height;
     world(){
         world_width = 10000;
         world_height = 10000;
-        hoge = new gun[50];
-        // hoge = new ArrayList<gun>();
+        gun_list = new gun[10];
         gun bar;
-        for (int i = 0; i < 50; i++) {
-            hoge[i] = new gun(i%4);
-            hoge[i].x = random(-world_width/2, world_width/2);
-            hoge[i].y = random(-world_width/2, world_height/2);
+        for (int i = 0; i < gun_list.length; i++) {
+            gun_list[i] = new gun(i%4);
+            gun_list[i].x = random(-world_width/2, world_width/2);
+            gun_list[i].y = random(-world_width/2, world_height/2);
         }
-        foo = new npc[10];
-        for (int i = 0; i < foo.length; i++){
-            foo[i] = new npc(random(-1000,1000), random(-1000,1000));
+        npc_list = new npc[5];
+        for (int i = 0; i < npc_list.length; i++){
+            npc_list[i] = new npc(random(-1000,1000), random(-1000,1000));
         }
-        pl = new player(foo, hoge);
+        player_list = new player[1];
+        player pl = new player(npc_list, gun_list);
+        player_list[0] = pl;
+        for (int i = 0; i < npc_list.length; i++){
+            npc_list[i].set_terget(player_list);
+        }
     }
     public void display(){
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
-        scale(1/pl.sc.magnification);
+        scale(1/player_list[0].sc.magnification);
 
-        translate(-pl.get_pos().x, -pl.get_pos().y);
+        translate(-player_list[0].get_pos().x, -player_list[0].get_pos().y);
         line(world_width/2, 0, -world_width/2, 0);
         for (float i = 0; i < world_width/2; i+=100){
             line(i, 25, i, -25);
@@ -524,13 +593,13 @@ class world{
             line(25, i, -25, i);
             line(25, -i, -25, -i);
         }
-        for (int i = 0; i < hoge.length; i++) {
-            hoge[i].display();
+        for (int i = 0; i < gun_list.length; i++) {
+            gun_list[i].display();
         }
-        for (int i = 0; i < foo.length; i++) {
-            foo[i].display();
+        for (int i = 0; i < npc_list.length; i++) {
+            npc_list[i].display();
         }
-        pl.display();
+        player_list[0].display();
     }
 }
   public void settings() {  size(1440, 810); }
