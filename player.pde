@@ -34,13 +34,14 @@ class player{
     scope sc;
 
     npc[] enemy;
-    gun[] item_list;
+    gun[] gun_list;
+    scope[] scope_list;
 
     float total_damage;
     float total_suffered_damage;
     int kill_count;
 
-    player(npc[] hoge, gun[] poyo){
+    player(npc[] hoge, gun[] poyo, scope[] foo){
         pos = new coordinate();
         arma = new armar(4);
         arma.is_show = false;
@@ -52,19 +53,21 @@ class player{
         hitpoints = 100;
         entity_size = 50;
         enemy = hoge;
-        item_list = poyo;
+        gun_list = poyo;
+        scope_list = foo;
         total_damage = 0;
         total_suffered_damage = 0;
     }
 
     void display(){
         if (hitpoints == 0){
-            textSize(100);
+            fill(color(255,0,0));
+            textSize(100*sc.magnification);
             text("YOU DIED", pos.x, pos.y);
-            textSize(60);
+            textSize(60*sc.magnification);
             fill(0);
-            text("damage: "+total_damage+" kill: "+kill_count, pos.x, pos.y+200);
-            text("suffered damage: "+total_suffered_damage, pos.x, pos.y+400);
+            text("damage: "+total_damage+" kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
+            text("suffered damage: "+total_suffered_damage, pos.x, pos.y+200*sc.magnification);
             return;
         }
         main.display();
@@ -82,12 +85,13 @@ class player{
         ellipse(entity_size/2, -15, 10, 10);
         ellipse(entity_size/2, 15, 10, 10);
         rotate(-facing);
-
         scale(sc.magnification);
         showHP();
         showAMO();
         translate(-pos.x, -pos.y);
-        pickup();
+        gun_pickup();
+        scope_pickup();
+        main.shoot_ct--;
     }
 
     void showHP(){
@@ -163,15 +167,15 @@ class player{
         facing += (facing_target - facing)*main.weight;
     }
 
-    void pickup(){
+    void gun_pickup(){
         if (keyPressed == true){
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
-                for (int i = 0; i < item_list.length; i++){
-                    if (50>dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, item_list[i].x, item_list[i].y)){
+                for (int i = 0; i < gun_list.length; i++){
+                    if (50>dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y)){
+                        if(kouho.distance > dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, item_list[i].x, item_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y);
                         }
                     }
                 }
@@ -179,24 +183,64 @@ class player{
                     return;
                 }else{
                     gun sw = main;
-                    main = item_list[kouho.num];
+                    main = gun_list[kouho.num];
                     main.is_show = false;
-                    item_list[kouho.num] = sw;
-                    item_list[kouho.num].is_show = true;
-                    if ((int(random(10000))&1) == 0){
-                        item_list[kouho.num].x = pos.x +100 + random(-20,20);
-                    }else{
-                        item_list[kouho.num].x = pos.x -100 + random(-20,20);
-                    }
-                    if ((int(random(10000))&1) == 0){
-                        item_list[kouho.num].y = pos.y +100 + random(-20,20);
-                    }else{
-                        item_list[kouho.num].y = pos.x -100 + random(-20,20);
-                    }
+                    gun_list[kouho.num] = sw;
+                    gun_list[kouho.num].is_show = true;
+                    float kakudo = random(0, radians(360));
+                    gun_list[kouho.num].x = pos.x + cos(kakudo)*100;
+                    gun_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    // if ((int(random(10000))&1) == 0){
+                    //     gun_list[kouho.num].x = pos.x +100 + random(-20,20);
+                    // }else{
+                    //     gun_list[kouho.num].x = pos.x -100 + random(-20,20);
+                    // }
+                    // if ((int(random(10000))&1) == 0){
+                    //     gun_list[kouho.num].y = pos.y +100 + random(-20,20);
+                    // }else{
+                    //     gun_list[kouho.num].y = pos.x -100 + random(-20,20);
+                    // }
                 }
             }
         }
-        main.shoot_ct--;
+    }
+
+    void scope_pickup(){
+        if (keyPressed == true){
+            if(key == 'e'){
+                num_and_dist kouho = new num_and_dist(2147483647, 1000000);
+                for (int i = 0; i < scope_list.length; i++){
+                    if (50>dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y)){
+                        if(kouho.distance > dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y)){
+                            kouho.num = i;
+                            kouho.distance = dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y);
+                        }
+                    }
+                }
+                if (kouho.num == 2147483647){
+                    return;
+                }else{
+                    scope swap = sc;
+                    sc = scope_list[kouho.num];
+                    sc.is_show = false;
+                    scope_list[kouho.num] = swap;
+                    scope_list[kouho.num].is_show = true;
+                    float kakudo = random(0, radians(360));
+                    scope_list[kouho.num].x = pos.x + cos(kakudo)*100;
+                    scope_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    // if ((int(random(10000))&1) == 0){
+                    //     scope_list[kouho.num].x = pos.x +100 + random(-20,20);
+                    // }else{
+                    //     scope_list[kouho.num].x = pos.x -100 + random(-20,20);
+                    // }
+                    // if ((int(random(10000))&1) == 0){
+                    //     scope_list[kouho.num].y = pos.y +100 + random(-20,20);
+                    // }else{
+                    //     scope_list[kouho.num].y = pos.x -100 + random(-20,20);
+                    // }
+                }
+            }
+        }
     }
 
     coordinate get_pos(){

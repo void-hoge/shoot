@@ -69,7 +69,7 @@ class npc{
             if(abs(facing_target-facing) > radians(180)){
                 facing_target+=radians(360);
             }
-            facing += (facing_target - facing)*main.weight;
+            facing += (facing_target - facing)*(main.weight);
 
             translate(pos.x, pos.y);
             rotate(facing+main.gap);

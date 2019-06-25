@@ -11,46 +11,27 @@ abstract class item{
 
 class scope extends item{
     float magnification;
-    scope(){
-        is_show = true;
-        magnification = 1;
+    scope(float mag){
+        is_show = false;
+        magnification = mag;
     }
-    scope(float num){
+    scope(float xx, float yy, float num){
+        x = xx;
+        y = yy;
         is_show = true;
         magnification = num;
     }
     void display(){
         if (is_show){
-
+            fill(color(0, 0, 255));
+            textSize(30);
+            text(int(magnification), x, y+10);
+            strokeWeight(3);
+            stroke(color(0, 0, 255));
+            noFill();
+            ellipse(x, y, 40, 40);
         }
     }
-}
-
-class amo extends item{
-    int amo;
-    amo(){
-        is_show = false;
-        amo = 100;
-    }
-    void display(){}
-}
-
-class heal extends item{
-    float hitpoints;
-    heal(){
-        is_show = false;
-        hitpoints = 50;
-    }
-    void display(){}
-}
-
-class charge extends item{
-    float hitpoints;
-    charge(){
-        is_show = false;
-        hitpoints = 50;
-    }
-    void display(){}
 }
 
 class armar extends item{

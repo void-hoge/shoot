@@ -1,7 +1,7 @@
 class system{
     world hoge;
     system(){
-        hoge = new world(BORING);
+        hoge = new world(TEST);
     }
     void display(){
         hoge.display();

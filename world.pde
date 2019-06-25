@@ -1,3 +1,4 @@
+final int TEST = -1;
 final int BORING = 0;
 final int EASY = 1;
 final int NORMAL = 2;
@@ -8,6 +9,7 @@ class world{
     player[] player_list;
     gun[] gun_list;
     npc[] npc_list;
+    scope[] scope_list;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -23,7 +25,7 @@ class world{
             npc_list[i] = new npc(random(-1000,1000), random(-1000,1000));
         }
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list);
+        player pl = new player(npc_list, gun_list, scope_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
             npc_list[i].set_terget(player_list);
@@ -38,28 +40,56 @@ class world{
             gun_list[i].x = random(-world_width/2, world_height/2);
             gun_list[i].y = random(-world_width/2, world_height/2);
         }
+        scope_list = new scope[4];
+        for (int i = 0; i < scope_list.length; i++){
+            scope_list[i] = new scope(random(-300, 300), random(-300, 300), float(i+1));
+        }
         switch (difficulty){
+            case TEST:
+                npc_list = new npc[1];
+                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), EASY, HG);
+                break;
             case BORING:
                 npc_list = new npc[2];
+                for (int i = 0; i < npc_list.length; i++){
+                    npc_list[i] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                }
                 break;
             case EASY:
                 npc_list = new npc[3];
+                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
                 break;
             case NORMAL:
                 npc_list = new npc[5];
+                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
+                npc_list[3] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
+                npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
                 break;
             case HARD:
                 npc_list = new npc[5];
+                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
+                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
+                npc_list[3] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
+                npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
                 break;
             case INSANE:
                 npc_list = new npc[5];
+                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
+                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
+                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
+                npc_list[3] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
+                npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
                 break;
         }
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list);
+        player pl = new player(npc_list, gun_list, scope_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
-            npc_list[i] = new npc(random(-1000,1000), random(-1000, 1000), difficulty);
             npc_list[i].set_terget(player_list);
         }
     }
@@ -85,6 +115,9 @@ class world{
         }
         for (int i = 0; i < npc_list.length; i++) {
             npc_list[i].display();
+        }
+        for (int i = 0; i < scope_list.length; i++){
+            scope_list[i].display();
         }
         player_list[0].display();
     }
