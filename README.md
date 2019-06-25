@@ -7,3 +7,4 @@ This project developed using Atom editor and processing package.(https://atom.io
 6/19 add scope, weapon's pics, initial npc  
 6/21 hit calculation  
 6/24 enemy shooting a gun, hp bar fix, you died screen
+6/26 menu screen, add core object etc...
