@@ -1,7 +1,7 @@
 system sys;
 
 void setup(){
-    size(1440, 810);
+    size(1440, 810, P2D);
     sys = new system();
     frameRate(60);
 }
