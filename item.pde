@@ -37,17 +37,34 @@ class scope extends item{
 class armar extends item{
     int armar_level;
     float hitpoints;
-    armar(int level){
+    PImage img;
+    armar(float xx, float yy, int level){
+        x = xx;
+        y = yy;
         armar_level = level;
         hitpoints = armar_level*25;
         is_show = true;
+        switch(level){
+            case 1:
+                img = loadImage("ARMOR1.png");
+                break;
+            case 2:
+                img = loadImage("ARMOR2.png");
+                break;
+            case 3:
+                img = loadImage("ARMOR3.png");
+                break;
+            case 4:
+                img = loadImage("ARMOR4.png");
+                break;
+        }
     }
     float get_hitpoints(){
         return hitpoints;
     }
     void display(){
         if (is_show){
-            text(armar_level, x, y);
+            image(img, x, y, 100, 100);
         }
     }
     void showHP(){
@@ -81,10 +98,10 @@ class armar extends item{
     }
 }
 
-final int SMG = 0;
-final int AR = 1;
-final int SR = 2;
-final int HG = 3;
+final int HG = 0;
+final int SMG = 1;
+final int AR = 2;
+final int SR = 3;
 
 class gun extends item{
     int type;

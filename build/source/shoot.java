@@ -66,17 +66,34 @@ class scope extends item{
 class armar extends item{
     int armar_level;
     float hitpoints;
-    armar(int level){
+    PImage img;
+    armar(float xx, float yy, int level){
+        x = xx;
+        y = yy;
         armar_level = level;
         hitpoints = armar_level*25;
         is_show = true;
+        switch(level){
+            case 1:
+                img = loadImage("ARMOR1.png");
+                break;
+            case 2:
+                img = loadImage("ARMOR2.png");
+                break;
+            case 3:
+                img = loadImage("ARMOR3.png");
+                break;
+            case 4:
+                img = loadImage("ARMOR4.png");
+                break;
+        }
     }
     public float get_hitpoints(){
         return hitpoints;
     }
     public void display(){
         if (is_show){
-            text(armar_level, x, y);
+            image(img, x, y, 100, 100);
         }
     }
     public void showHP(){
@@ -110,10 +127,10 @@ class armar extends item{
     }
 }
 
-final int SMG = 0;
-final int AR = 1;
-final int SR = 2;
-final int HG = 3;
+final int HG = 0;
+final int SMG = 1;
+final int AR = 2;
+final int SR = 3;
 
 class gun extends item{
     int type;
@@ -268,17 +285,11 @@ class npc{
         }
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
-            float facing_target= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
-            if(abs(facing_target-facing) > radians(180)){
-                facing_target+=radians(360);
-            }
-            facing += (facing_target - facing)*(main.weight);
-
             translate(pos.x, pos.y);
             rotate(facing+main.gap);
             strokeWeight(3);
             stroke(255, 212, 0);
-            line(0,0, main.range, 0);
+            line(0,9, main.range, 0);
             rotate(-(facing+main.gap));
             translate(-pos.x, -pos.y);
 
@@ -301,14 +312,33 @@ class npc{
         main.shoot_ct--;
     }
 
+    public void update_pos(){
+        if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)){
+            //display line
+            float facing_target= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            if(abs(facing_target-facing) > radians(180)){
+                facing_target+=radians(360);
+            }
+            facing += (facing_target - facing)*(main.weight/5);
+        }
+    }
+
     public void display(){
         if (hitpoints > 0){
+            update_pos();
+            shoot();
+            translate(pos.x, pos.y);
+            rotate(facing);
+            fill(0);
+            rect(entity_size/2+30*(main.type+1), 5, -30*(main.type+1), 8);
+            rotate(-facing);
+            translate(-pos.x, -pos.y);
+
             noStroke();
             fill(255, 0, 0);
             ellipse(pos.x, pos.y, entity_size, entity_size);
             textSize(20);
-            text(hitpoints, pos.x, pos.y);
-            shoot();
+            text(PApplet.parseInt(hitpoints), pos.x, pos.y-40);
         }else{
             target[0].kill_count++;
             switch (target[0].main.type){
@@ -418,14 +448,15 @@ class player{
     npc[] enemy;
     gun[] gun_list;
     scope[] scope_list;
+    armar[] armar_list;
 
     float total_damage;
     float total_suffered_damage;
     int kill_count;
 
-    player(npc[] hoge, gun[] poyo, scope[] foo){
+    player(npc[] hoge, gun[] poyo, scope[] foo, armar[] bar){
         pos = new coordinate();
-        arma = new armar(4);
+        arma = new armar(0,0,4);
         arma.is_show = false;
         main = new gun(AR);
         main.is_show = false;
@@ -437,6 +468,7 @@ class player{
         enemy = hoge;
         gun_list = poyo;
         scope_list = foo;
+        armar_list = bar;
         total_damage = 0;
         total_suffered_damage = 0;
     }
@@ -448,31 +480,41 @@ class player{
             text("YOU DIED", pos.x, pos.y);
             textSize(60*sc.magnification);
             fill(0);
-            text("damage: "+total_damage+" kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
-            text("suffered damage: "+total_suffered_damage, pos.x, pos.y+200*sc.magnification);
+            text("damage: "+PApplet.parseInt(total_damage)+" kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
+            text("suffered damage: "+PApplet.parseInt(total_suffered_damage), pos.x, pos.y+200*sc.magnification);
             return;
         }
-        main.display();
-        update_pos();
         shoot();
         translate(pos.x, pos.y);
-        rotate(facing);
-        strokeWeight(3);
-        stroke(255, 50);
-        line(0, 0, main.range, 0);
-        noStroke();
-        fill(255);
-        ellipse(0, 0, entity_size, entity_size);
-        fill(0);
-        ellipse(entity_size/2, -15, 10, 10);
-        ellipse(entity_size/2, 15, 10, 10);
-        rotate(-facing);
-        scale(sc.magnification);
-        showHP();
-        showAMO();
+
+            update_pos();
+            rotate(facing);
+
+                strokeWeight(3);
+                stroke(255, 50);
+                line(0, 9, main.range, 0);
+
+                fill(0);
+                rect(entity_size/2+30*(main.type+1), 5, -30*(main.type+1), 8);
+
+                noStroke();
+                fill(255);
+                ellipse(0, 0, entity_size, entity_size);
+                fill(0);
+                ellipse(entity_size/2, -15, 10, 10);
+                ellipse(entity_size/2, 15, 10, 10);
+
+            rotate(-facing);
+
+            scale(sc.magnification);
+
+            showHP();
+            showAMO();
+
         translate(-pos.x, -pos.y);
         gun_pickup();
         scope_pickup();
+        armar_pickup();
         main.shoot_ct--;
     }
 
@@ -495,12 +537,12 @@ class player{
 
     public void shoot(){
         if (mousePressed&&(main.shoot_ct <= 0)&&(main.amo > 0)){
-            //display line
             translate(pos.x, pos.y);
+            //display line
             rotate(facing+main.gap);
             strokeWeight(3);
             stroke(255, 212, 0);
-            line(0,0, main.range, 0);
+            line(0,9, main.range, 0);
             rotate(-(facing+main.gap));
             translate(-pos.x, -pos.y);
 
@@ -564,24 +606,14 @@ class player{
                 if (kouho.num == 2147483647){
                     return;
                 }else{
-                    gun sw = main;
+                    gun swap = main;
                     main = gun_list[kouho.num];
                     main.is_show = false;
-                    gun_list[kouho.num] = sw;
+                    gun_list[kouho.num] = swap;
                     gun_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
                     gun_list[kouho.num].x = pos.x + cos(kakudo)*100;
                     gun_list[kouho.num].y = pos.y + sin(kakudo)*100;
-                    // if ((int(random(10000))&1) == 0){
-                    //     gun_list[kouho.num].x = pos.x +100 + random(-20,20);
-                    // }else{
-                    //     gun_list[kouho.num].x = pos.x -100 + random(-20,20);
-                    // }
-                    // if ((int(random(10000))&1) == 0){
-                    //     gun_list[kouho.num].y = pos.y +100 + random(-20,20);
-                    // }else{
-                    //     gun_list[kouho.num].y = pos.x -100 + random(-20,20);
-                    // }
                 }
             }
         }
@@ -610,16 +642,34 @@ class player{
                     float kakudo = random(0, radians(360));
                     scope_list[kouho.num].x = pos.x + cos(kakudo)*100;
                     scope_list[kouho.num].y = pos.y + sin(kakudo)*100;
-                    // if ((int(random(10000))&1) == 0){
-                    //     scope_list[kouho.num].x = pos.x +100 + random(-20,20);
-                    // }else{
-                    //     scope_list[kouho.num].x = pos.x -100 + random(-20,20);
-                    // }
-                    // if ((int(random(10000))&1) == 0){
-                    //     scope_list[kouho.num].y = pos.y +100 + random(-20,20);
-                    // }else{
-                    //     scope_list[kouho.num].y = pos.x -100 + random(-20,20);
-                    // }
+                }
+            }
+        }
+    }
+
+    public void armar_pickup(){
+        if (keyPressed == true){
+            if(key == 'e'){
+                num_and_dist kouho = new num_and_dist(2147483647, 1000000);
+                for (int i = 0; i < armar_list.length; i++){
+                    if (50>dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y)){
+                        if(kouho.distance > dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y)){
+                            kouho.num = i;
+                            kouho.distance = dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y);
+                        }
+                    }
+                }
+                if (kouho.num == 2147483647){
+                    return;
+                }else{
+                    armar swap = arma;
+                    arma = armar_list[kouho.num];
+                    arma.is_show = false;
+                    armar_list[kouho.num] = swap;
+                    armar_list[kouho.num].is_show = true;
+                    float kakudo = random(0, radians(360));
+                    armar_list[kouho.num].x = pos.x + cos(kakudo)*100;
+                    armar_list[kouho.num].y = pos.y + sin(kakudo)*100;
                 }
             }
         }
@@ -664,7 +714,7 @@ class player{
 class system{
     world hoge;
     system(){
-        hoge = new world(TEST);
+        hoge = new world(EASY);
     }
     public void display(){
         hoge.display();
@@ -682,6 +732,7 @@ class world{
     gun[] gun_list;
     npc[] npc_list;
     scope[] scope_list;
+    armar[] armar_list;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -697,7 +748,7 @@ class world{
             npc_list[i] = new npc(random(-1000,1000), random(-1000,1000));
         }
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list, scope_list);
+        player pl = new player(npc_list, gun_list, scope_list, armar_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
             npc_list[i].set_terget(player_list);
@@ -715,6 +766,10 @@ class world{
         scope_list = new scope[4];
         for (int i = 0; i < scope_list.length; i++){
             scope_list[i] = new scope(random(-300, 300), random(-300, 300), PApplet.parseFloat(i+1));
+        }
+        armar_list = new armar[4];
+        for (int i = 0; i < armar_list.length; i++){
+            armar_list[i] = new armar(random(-300, 300), random(-300, 300), (i%4)+1);
         }
         switch (difficulty){
             case TEST:
@@ -759,7 +814,7 @@ class world{
                 break;
         }
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list, scope_list);
+        player pl = new player(npc_list, gun_list, scope_list, armar_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
             npc_list[i].set_terget(player_list);
@@ -790,6 +845,9 @@ class world{
         }
         for (int i = 0; i < scope_list.length; i++){
             scope_list[i].display();
+        }
+        for (int i = 0; i < armar_list.length; i++){
+            armar_list[i].display();
         }
         player_list[0].display();
     }

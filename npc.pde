@@ -65,17 +65,11 @@ class npc{
         }
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
-            float facing_target= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
-            if(abs(facing_target-facing) > radians(180)){
-                facing_target+=radians(360);
-            }
-            facing += (facing_target - facing)*(main.weight);
-
             translate(pos.x, pos.y);
             rotate(facing+main.gap);
             strokeWeight(3);
             stroke(255, 212, 0);
-            line(0,0, main.range, 0);
+            line(0,9, main.range, 0);
             rotate(-(facing+main.gap));
             translate(-pos.x, -pos.y);
 
@@ -98,14 +92,33 @@ class npc{
         main.shoot_ct--;
     }
 
+    void update_pos(){
+        if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)){
+            //display line
+            float facing_target= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            if(abs(facing_target-facing) > radians(180)){
+                facing_target+=radians(360);
+            }
+            facing += (facing_target - facing)*(main.weight/5);
+        }
+    }
+
     void display(){
         if (hitpoints > 0){
+            update_pos();
+            shoot();
+            translate(pos.x, pos.y);
+            rotate(facing);
+            fill(0);
+            rect(entity_size/2+30*(main.type+1), 5, -30*(main.type+1), 8);
+            rotate(-facing);
+            translate(-pos.x, -pos.y);
+
             noStroke();
             fill(255, 0, 0);
             ellipse(pos.x, pos.y, entity_size, entity_size);
             textSize(20);
-            text(hitpoints, pos.x, pos.y);
-            shoot();
+            text(int(hitpoints), pos.x, pos.y-40);
         }else{
             target[0].kill_count++;
             switch (target[0].main.type){

@@ -10,6 +10,7 @@ class world{
     gun[] gun_list;
     npc[] npc_list;
     scope[] scope_list;
+    armar[] armar_list;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -25,7 +26,7 @@ class world{
             npc_list[i] = new npc(random(-1000,1000), random(-1000,1000));
         }
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list, scope_list);
+        player pl = new player(npc_list, gun_list, scope_list, armar_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
             npc_list[i].set_terget(player_list);
@@ -43,6 +44,10 @@ class world{
         scope_list = new scope[4];
         for (int i = 0; i < scope_list.length; i++){
             scope_list[i] = new scope(random(-300, 300), random(-300, 300), float(i+1));
+        }
+        armar_list = new armar[4];
+        for (int i = 0; i < armar_list.length; i++){
+            armar_list[i] = new armar(random(-300, 300), random(-300, 300), (i%4)+1);
         }
         switch (difficulty){
             case TEST:
@@ -87,7 +92,7 @@ class world{
                 break;
         }
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list, scope_list);
+        player pl = new player(npc_list, gun_list, scope_list, armar_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
             npc_list[i].set_terget(player_list);
@@ -118,6 +123,9 @@ class world{
         }
         for (int i = 0; i < scope_list.length; i++){
             scope_list[i].display();
+        }
+        for (int i = 0; i < armar_list.length; i++){
+            armar_list[i].display();
         }
         player_list[0].display();
     }
