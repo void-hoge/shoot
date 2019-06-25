@@ -62,7 +62,7 @@ class player{
     }
 
     void display(){
-        if (hitpoints == 0){
+        if (hitpoints <= 0){
             fill(color(255,0,0));
             textSize(100*sc.magnification);
             text("YOU DIED", pos.x, pos.y);

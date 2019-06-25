@@ -6,6 +6,7 @@ class npc{
     float damage_rate;
     int heal_possibility;
     player[] target;
+    core[] target_core;
     gun main;
     int type;
 
@@ -17,8 +18,9 @@ class npc{
         facing = 0;
     }
 
-    void set_terget(player[] pl){
+    void set_terget(player[] pl, core[] co){
         target = pl;
+        target_core = co;
     }
 
     npc(){
@@ -63,6 +65,9 @@ class npc{
         if(target[0].hitpoints == 0){
             return;
         }
+        if(target_core[0].hitpoints == 0){
+            return;
+        }
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
             translate(pos.x, pos.y);
@@ -88,9 +93,35 @@ class npc{
             main.shoot_ct = main.rate;
             main.set_gap();
             main.amo--;
+        }else
+        if ((dist(target_core[0].pos.x, target_core[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
+            //display line
+            translate(pos.x, pos.y);
+            rotate(facing+main.gap);
+            strokeWeight(3);
+            stroke(255, 212, 0);
+            line(0,9, main.range, 0);
+            rotate(-(facing+main.gap));
+            translate(-pos.x, -pos.y);
+
+            //culcurate hits
+            coordinate end;
+            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));
+            end.x*=main.range;
+            end.x+=pos.x;
+            end.y*=main.range;
+            end.y+=pos.y;
+            if (main.range+target_core[0].entity_size > dist(pos.x, pos.y, target_core[0].pos.x, target_core[0].pos.y)){
+                if(abs((pos.y-end.y)*target_core[0].pos.x-(pos.x-end.x)*target_core[0].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < target_core[0].entity_size){
+                    target_core[0].decrease_hitpoint(main.damage);
+                }
+            }
+            main.shoot_ct = main.rate;
+            main.set_gap();
+            main.amo--;
         }
-        main.shoot_ct--;
     }
+
 
     void update_pos(){
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)){
@@ -100,6 +131,20 @@ class npc{
                 facing_target+=radians(360);
             }
             facing += (facing_target - facing)*(main.weight/5);
+        }else
+        if ((dist(target_core[0].pos.x, target_core[0].pos.y, pos.x, pos.y) <= main.range+target_core[0].entity_size)){
+            //display line
+            float facing_target= atan2(target_core[0].pos.y-pos.y, target_core[0].pos.x-pos.x);
+            if(abs(facing_target-facing) > radians(180)){
+                facing_target+=radians(360);
+            }
+            facing += (facing_target - facing)*(main.weight/5);
+        }
+
+        float direction = atan2(target_core[0].pos.y-pos.y, target_core[0].pos.x-pos.x);
+        if(dist(target_core[0].pos.x, target_core[0].pos.y, pos.x, pos.y) > 500){
+            pos.x += cos(direction);
+            pos.y += sin(direction);
         }
     }
 
@@ -109,6 +154,7 @@ class npc{
             shoot();
             translate(pos.x, pos.y);
             rotate(facing);
+            noStroke();
             fill(0);
             rect(entity_size/2+30*(main.type+1), 5, -30*(main.type+1), 8);
             rotate(-facing);
@@ -119,6 +165,8 @@ class npc{
             ellipse(pos.x, pos.y, entity_size, entity_size);
             textSize(20);
             text(int(hitpoints), pos.x, pos.y-40);
+
+            main.shoot_ct--;
         }else{
             target[0].kill_count++;
             switch (target[0].main.type){

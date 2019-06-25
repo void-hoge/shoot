@@ -38,3 +38,48 @@ class object{
         }
     }
 }
+
+class core{
+    coordinate pos;
+    float entity_size = 400;
+    float hitpoints;
+    core(){
+        hitpoints = 5000;
+        pos = new coordinate(0, 0);
+    }
+    core(float hp){
+        hitpoints = hp;
+        pos = new coordinate(0, 0);
+    }
+    boolean display(){
+        if (hitpoints > 0){
+            noStroke();
+            color begin = color(255, 255, 0);
+            color end = color(255, 0, 255);
+            for(int i = 0; i < 10; i++){
+                color c = lerpColor(begin, end, float(i)/10);
+                fill(c);
+                ellipse(0,0,(10-i)*40,(10-i)*40);
+            }
+
+            stroke(0);
+            strokeWeight(1);
+            noFill();
+            rect(-250, -250, 500, 30);
+            noStroke();
+            fill(255);
+            rect(-250, -250, hitpoints/10, 30);
+            fill(0);
+            text(int(hitpoints)+"/"+5000, 0, -225);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    void decrease_hitpoint(float points){
+        hitpoints -=points;
+        if (hitpoints < 0){
+            hitpoints = 0;
+        }
+    }
+}

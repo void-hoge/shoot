@@ -23,8 +23,7 @@ public void setup(){
 }
 
 public void draw(){
-    translate(width/2,height/2);
-    textAlign(CENTER);
+    textAlign(CENTER, CENTER);
     sys.display();
 }
 abstract class item{
@@ -226,6 +225,7 @@ class npc{
     float damage_rate;
     int heal_possibility;
     player[] target;
+    core[] target_core;
     gun main;
     int type;
 
@@ -237,8 +237,9 @@ class npc{
         facing = 0;
     }
 
-    public void set_terget(player[] pl){
+    public void set_terget(player[] pl, core[] co){
         target = pl;
+        target_core = co;
     }
 
     npc(){
@@ -283,6 +284,9 @@ class npc{
         if(target[0].hitpoints == 0){
             return;
         }
+        if(target_core[0].hitpoints == 0){
+            return;
+        }
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
             translate(pos.x, pos.y);
@@ -308,9 +312,35 @@ class npc{
             main.shoot_ct = main.rate;
             main.set_gap();
             main.amo--;
+        }else
+        if ((dist(target_core[0].pos.x, target_core[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
+            //display line
+            translate(pos.x, pos.y);
+            rotate(facing+main.gap);
+            strokeWeight(3);
+            stroke(255, 212, 0);
+            line(0,9, main.range, 0);
+            rotate(-(facing+main.gap));
+            translate(-pos.x, -pos.y);
+
+            //culcurate hits
+            coordinate end;
+            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));
+            end.x*=main.range;
+            end.x+=pos.x;
+            end.y*=main.range;
+            end.y+=pos.y;
+            if (main.range+target_core[0].entity_size > dist(pos.x, pos.y, target_core[0].pos.x, target_core[0].pos.y)){
+                if(abs((pos.y-end.y)*target_core[0].pos.x-(pos.x-end.x)*target_core[0].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < target_core[0].entity_size){
+                    target_core[0].decrease_hitpoint(main.damage);
+                }
+            }
+            main.shoot_ct = main.rate;
+            main.set_gap();
+            main.amo--;
         }
-        main.shoot_ct--;
     }
+
 
     public void update_pos(){
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)){
@@ -320,6 +350,20 @@ class npc{
                 facing_target+=radians(360);
             }
             facing += (facing_target - facing)*(main.weight/5);
+        }else
+        if ((dist(target_core[0].pos.x, target_core[0].pos.y, pos.x, pos.y) <= main.range+target_core[0].entity_size)){
+            //display line
+            float facing_target= atan2(target_core[0].pos.y-pos.y, target_core[0].pos.x-pos.x);
+            if(abs(facing_target-facing) > radians(180)){
+                facing_target+=radians(360);
+            }
+            facing += (facing_target - facing)*(main.weight/5);
+        }
+
+        float direction = atan2(target_core[0].pos.y-pos.y, target_core[0].pos.x-pos.x);
+        if(dist(target_core[0].pos.x, target_core[0].pos.y, pos.x, pos.y) > 500){
+            pos.x += cos(direction);
+            pos.y += sin(direction);
         }
     }
 
@@ -329,6 +373,7 @@ class npc{
             shoot();
             translate(pos.x, pos.y);
             rotate(facing);
+            noStroke();
             fill(0);
             rect(entity_size/2+30*(main.type+1), 5, -30*(main.type+1), 8);
             rotate(-facing);
@@ -339,6 +384,8 @@ class npc{
             ellipse(pos.x, pos.y, entity_size, entity_size);
             textSize(20);
             text(PApplet.parseInt(hitpoints), pos.x, pos.y-40);
+
+            main.shoot_ct--;
         }else{
             target[0].kill_count++;
             switch (target[0].main.type){
@@ -410,6 +457,51 @@ class object{
         }
     }
 }
+
+class core{
+    coordinate pos;
+    float entity_size = 400;
+    float hitpoints;
+    core(){
+        hitpoints = 5000;
+        pos = new coordinate(0, 0);
+    }
+    core(float hp){
+        hitpoints = hp;
+        pos = new coordinate(0, 0);
+    }
+    public boolean display(){
+        if (hitpoints > 0){
+            noStroke();
+            int begin = color(255, 255, 0);
+            int end = color(255, 0, 255);
+            for(int i = 0; i < 10; i++){
+                int c = lerpColor(begin, end, PApplet.parseFloat(i)/10);
+                fill(c);
+                ellipse(0,0,(10-i)*40,(10-i)*40);
+            }
+
+            stroke(0);
+            strokeWeight(1);
+            noFill();
+            rect(-250, -250, 500, 30);
+            noStroke();
+            fill(255);
+            rect(-250, -250, hitpoints/10, 30);
+            fill(0);
+            text(PApplet.parseInt(hitpoints)+"/"+5000, 0, -225);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public void decrease_hitpoint(float points){
+        hitpoints -=points;
+        if (hitpoints < 0){
+            hitpoints = 0;
+        }
+    }
+}
 class coordinate{
     float x, y;
     coordinate(){
@@ -474,7 +566,7 @@ class player{
     }
 
     public void display(){
-        if (hitpoints == 0){
+        if (hitpoints <= 0){
             fill(color(255,0,0));
             textSize(100*sc.magnification);
             text("YOU DIED", pos.x, pos.y);
@@ -713,11 +805,87 @@ class player{
 }
 class system{
     world hoge;
+    boolean ismenu;
+    int difficulty;
     system(){
+        ismenu = true;
+        difficulty = 0;
         hoge = new world(EASY);
     }
     public void display(){
-        hoge.display();
+        if (!ismenu){
+            hoge.display();
+        }else{
+            noStroke();
+            int begin = color(0, 255, 255);
+            int end = color(255, 0, 255);
+            for (int i = 0; i < width; i+=10){
+                int c = lerpColor(begin, end, PApplet.parseFloat(i)/width);
+                fill(c);
+                rect(i, 0, 10, height);
+            }
+
+            if(start_button()){
+                ismenu = false;
+            }
+            // difficulty = difficulty_button(difficulty);
+        }
+    }
+}
+
+final String[] difficulty_name = {"BORING", "EASY", "NORMAL", "HARD", "INSANE"};
+
+public boolean start_button(){
+    float x = (width/2)-300;
+    float y = 25;
+    float w = 600;
+    float h = 100;
+    rectMode(CORNER);
+    textSize(150);
+    textAlign(CENTER, CENTER);
+    noStroke();
+    if ((mouseX > x)&&(mouseX < x+w)&&(mouseY > y)&&(mouseY < y+h)){
+        if (mousePressed){
+            fill(color(255, 0, 255));
+            text("SHOOT", width/2, 50);
+            return true;
+        }
+        fill(color(255, 0, 255));
+        text("SHOOT", width/2, 50);
+        return false;
+    }else{
+        fill(color(0, 255, 255));
+        text("SHOOT", width/2, 50);
+        return false;
+    }
+}
+
+public int difficulty_button(int init){
+    float x = (width/2)-200;
+    float y = 150;
+    float w = 400;
+    float h = 50;
+    rectMode(CORNER);
+    textSize(50);
+    textAlign(CENTER, CENTER);
+    noStroke();
+    if ((mouseX > x)&&(mouseX < x+w)&&(mouseY > y)&&(mouseY < y+h)){
+        init++;
+        if (init > 4){
+            init = 0;
+        }
+        if (mousePressed){
+            fill(color(255, 0, 255));
+            text(difficulty_name[init], width/2, 175);
+            return init;
+        }
+        fill(color(255, 0, 255));
+        text(difficulty_name[init], width/2, 175);
+        return --init;
+    }else{
+        fill(color(0, 255, 255));
+        text(difficulty_name[init], width/2, 175);
+        return init;
     }
 }
 final int TEST = -1;
@@ -733,6 +901,9 @@ class world{
     npc[] npc_list;
     scope[] scope_list;
     armar[] armar_list;
+    core[] core_list;
+    boolean isgameover;
+    int score;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -751,7 +922,7 @@ class world{
         player pl = new player(npc_list, gun_list, scope_list, armar_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
-            npc_list[i].set_terget(player_list);
+            npc_list[i].set_terget(player_list, core_list);
         }
     }
     world(int difficulty){
@@ -813,14 +984,19 @@ class world{
                 npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
                 break;
         }
+
+        core_list = new core[1];
+        core_list[0] = new core();
+        // player pl = new player(npc_list, gun_list, scope_list, armar_list);
+        // player_list[0] = pl;
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list, scope_list, armar_list);
-        player_list[0] = pl;
+        player_list[0] = new player(npc_list, gun_list, scope_list, armar_list);
         for (int i = 0; i < npc_list.length; i++){
-            npc_list[i].set_terget(player_list);
+            npc_list[i].set_terget(player_list, core_list);
         }
     }
     public void display(){
+        translate(width/2, height/2);
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
@@ -848,6 +1024,19 @@ class world{
         }
         for (int i = 0; i < armar_list.length; i++){
             armar_list[i].display();
+        }
+        if(!core_list[0].display()){
+            isgameover = true;
+            textSize(100*player_list[0].sc.magnification);
+            fill(255, 0, 0);
+            text("Game Over", 0, 0);
+
+            textSize(60*player_list[0].sc.magnification);
+            fill(0);
+            text("Score: "+score, 0, 100*player_list[0].sc.magnification);
+        }
+        if(isgameover == false){
+            score++;
         }
         player_list[0].display();
     }

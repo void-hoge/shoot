@@ -7,7 +7,6 @@ void setup(){
 }
 
 void draw(){
-    translate(width/2,height/2);
-    textAlign(CENTER);
+    textAlign(CENTER, CENTER);
     sys.display();
 }

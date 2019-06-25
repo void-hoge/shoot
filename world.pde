@@ -11,6 +11,9 @@ class world{
     npc[] npc_list;
     scope[] scope_list;
     armar[] armar_list;
+    core[] core_list;
+    boolean isgameover;
+    int score;
     float world_width, world_height;
     world(){
         world_width = 10000;
@@ -29,7 +32,7 @@ class world{
         player pl = new player(npc_list, gun_list, scope_list, armar_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
-            npc_list[i].set_terget(player_list);
+            npc_list[i].set_terget(player_list, core_list);
         }
     }
     world(int difficulty){
@@ -91,14 +94,19 @@ class world{
                 npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
                 break;
         }
+
+        core_list = new core[1];
+        core_list[0] = new core();
+        // player pl = new player(npc_list, gun_list, scope_list, armar_list);
+        // player_list[0] = pl;
         player_list = new player[1];
-        player pl = new player(npc_list, gun_list, scope_list, armar_list);
-        player_list[0] = pl;
+        player_list[0] = new player(npc_list, gun_list, scope_list, armar_list);
         for (int i = 0; i < npc_list.length; i++){
-            npc_list[i].set_terget(player_list);
+            npc_list[i].set_terget(player_list, core_list);
         }
     }
     void display(){
+        translate(width/2, height/2);
         stroke(0);
         strokeWeight(1);
         background(59, 175, 117);
@@ -126,6 +134,19 @@ class world{
         }
         for (int i = 0; i < armar_list.length; i++){
             armar_list[i].display();
+        }
+        if(!core_list[0].display()){
+            isgameover = true;
+            textSize(100*player_list[0].sc.magnification);
+            fill(255, 0, 0);
+            text("Game Over", 0, 0);
+
+            textSize(60*player_list[0].sc.magnification);
+            fill(0);
+            text("Score: "+score, 0, 100*player_list[0].sc.magnification);
+        }
+        if(isgameover == false){
+            score++;
         }
         player_list[0].display();
     }
