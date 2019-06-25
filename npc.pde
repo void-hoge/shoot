@@ -3,13 +3,14 @@ class npc{
     float hitpoints;
     float entity_size;
     float facing;
+    float damage_rate;
+    int heal_possibility;
     player[] target;
     gun main;
+    int type;
 
     npc(float xx, float yy){
         pos = new coordinate(xx, yy);
-        pos.x = xx;
-        pos.y = yy;
         main = new gun(HG);
         hitpoints = 100;
         entity_size = 50;
@@ -21,11 +22,41 @@ class npc{
     }
 
     npc(){
-        pos.x = 0;
-        pos.y = 0;
+        pos = new coordinate(0, 0);
         hitpoints = 100;
-        entity_size = 30;
+        entity_size = 50;
         facing = 0;
+    }
+
+    npc(float xx, float yy, int difficulty, int gun_type){
+        type = gun_type;
+        main = new gun(gun_type);
+        pos = new coordinate(xx,yy);
+        hitpoints = 100;
+        entity_size = 50;
+        facing = 0;
+        switch (difficulty){
+            case BORING:
+                damage_rate = 0.25;
+                heal_possibility = 100;
+                break;
+            case EASY:
+                damage_rate = 0.5;
+                heal_possibility = 80;
+                break;
+            case NORMAL:
+                damage_rate = 0.75;
+                heal_possibility = 60;
+                break;
+            case HARD:
+                damage_rate = 1;
+                heal_possibility = 40;
+                break;
+            case INSANE:
+                damage_rate = 1;
+                heal_possibility = 20;
+                break;
+        }
     }
 
     void shoot(){
@@ -34,7 +65,12 @@ class npc{
         }
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
-            facing= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            float facing_target= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            if(abs(facing_target-facing) > radians(180)){
+                facing_target+=radians(360);
+            }
+            facing += (facing_target - facing)*main.weight;
+
             translate(pos.x, pos.y);
             rotate(facing+main.gap);
             strokeWeight(3);
@@ -45,7 +81,7 @@ class npc{
 
             //culcurate hits
             coordinate end;
-            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));//unit vector
+            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));
             end.x*=main.range;
             end.x+=pos.x;
             end.y*=main.range;
@@ -70,6 +106,34 @@ class npc{
             textSize(20);
             text(hitpoints, pos.x, pos.y);
             shoot();
+        }else{
+            target[0].kill_count++;
+            switch (target[0].main.type){
+                case SMG:
+                    target[0].main.amo += 50;
+                    break;
+                case AR:
+                    target[0].main.amo += 30;
+                    break;
+                case SR:
+                    target[0].main.amo += 10;
+                    break;
+                case HG:
+                    target[0].main.amo += 20;
+                    break;
+            }
+            target[0].increase_hitpoints(20);
+            if(int(random(100))<=heal_possibility){
+                target[0].increase_armar_hitpoints(10);
+            }
+            respwan();
         }
+    }
+
+    void respwan(){
+        pos.x = random(-1000,1000);
+        pos.y = random(-1000,1000);
+        hitpoints = 100;
+        main = new gun(type);
     }
 }

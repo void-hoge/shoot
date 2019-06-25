@@ -28,14 +28,17 @@ class player{
     float facing;
     float hitpoints;
     int entity_size;    // radius
-    // int moving_vec;     //0b(up)(down)(left)(right)
 
-    private armar arma;
-    private gun main;
-    private scope sc;
+    armar arma;
+    gun main;
+    scope sc;
 
     npc[] enemy;
     gun[] item_list;
+
+    float total_damage;
+    float total_suffered_damage;
+    int kill_count;
 
     player(npc[] hoge, gun[] poyo){
         pos = new coordinate();
@@ -50,12 +53,18 @@ class player{
         entity_size = 50;
         enemy = hoge;
         item_list = poyo;
+        total_damage = 0;
+        total_suffered_damage = 0;
     }
 
     void display(){
         if (hitpoints == 0){
             textSize(100);
-            text("You dead", pos.x, pos.y);
+            text("YOU DIED", pos.x, pos.y);
+            textSize(60);
+            fill(0);
+            text("damage: "+total_damage+" kill: "+kill_count, pos.x, pos.y+200);
+            text("suffered damage: "+total_suffered_damage, pos.x, pos.y+400);
             return;
         }
         main.display();
@@ -120,10 +129,10 @@ class player{
                 if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].pos.x, enemy[i].pos.y)){
                     if(abs((pos.y-end.y)*enemy[i].pos.x-(pos.x-end.x)*enemy[i].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
                         enemy[i].hitpoints -= main.damage;
+                        total_damage += main.damage;
                     }
                 }
             }
-
             main.shoot_ct = main.rate;
             main.set_gap();
             main.amo--;
@@ -134,16 +143,16 @@ class player{
         if (keyPressed == true){
             switch (key){
                 case 'w':
-                    pos.y-=3.0;
+                    pos.y-=3.0*main.mobility;
                     break;
                 case 's':
-                    pos.y+=3.0;
+                    pos.y+=3.0*main.mobility;
                     break;
                 case 'a':
-                    pos.x-=3.0;
+                    pos.x-=3.0*main.mobility;
                     break;
                 case 'd':
-                    pos.x+=3.0;
+                    pos.x+=3.0*main.mobility;
                     break;
             }
         }
@@ -195,17 +204,34 @@ class player{
     }
 
     void decrease_hitpoint(float points){
+        total_suffered_damage += points;
         if (arma.hitpoints > 0){
             arma.hitpoints -= points;
             if (arma.hitpoints < 0){
                 points = -arma.hitpoints;
                 arma.hitpoints = 0;
+                hitpoints -= points;
             }
         }else{
             hitpoints -= points;
         }
         if (hitpoints < 0){
+            total_suffered_damage += hitpoints;
             hitpoints = 0;
+        }
+    }
+
+    void increase_hitpoints(float points){
+        hitpoints += points;
+        if (hitpoints > 100){
+            hitpoints = 100;
+        }
+    }
+
+    void increase_armar_hitpoints(float points){
+        arma.hitpoints += points;
+        if (arma.hitpoints > 25*arma.armar_level){
+            arma.hitpoints = 25*arma.armar_level;
         }
     }
 }

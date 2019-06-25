@@ -1,3 +1,9 @@
+final int BORING = 0;
+final int EASY = 1;
+final int NORMAL = 2;
+final int HARD = 3;
+final int INSANE = 4;
+
 class world{
     player[] player_list;
     gun[] gun_list;
@@ -7,7 +13,6 @@ class world{
         world_width = 10000;
         world_height = 10000;
         gun_list = new gun[10];
-        gun bar;
         for (int i = 0; i < gun_list.length; i++) {
             gun_list[i] = new gun(i%4);
             gun_list[i].x = random(-world_width/2, world_width/2);
@@ -21,6 +26,40 @@ class world{
         player pl = new player(npc_list, gun_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
+            npc_list[i].set_terget(player_list);
+        }
+    }
+    world(int difficulty){
+        world_width = 10000;
+        world_height = 10000;
+        gun_list = new gun[10];
+        for (int i = 0; i < gun_list.length; i++){
+            gun_list[i] = new gun(i%4);
+            gun_list[i].x = random(-world_width/2, world_height/2);
+            gun_list[i].y = random(-world_width/2, world_height/2);
+        }
+        switch (difficulty){
+            case BORING:
+                npc_list = new npc[2];
+                break;
+            case EASY:
+                npc_list = new npc[3];
+                break;
+            case NORMAL:
+                npc_list = new npc[5];
+                break;
+            case HARD:
+                npc_list = new npc[5];
+                break;
+            case INSANE:
+                npc_list = new npc[5];
+                break;
+        }
+        player_list = new player[1];
+        player pl = new player(npc_list, gun_list);
+        player_list[0] = pl;
+        for (int i = 0; i < npc_list.length; i++){
+            npc_list[i] = new npc(random(-1000,1000), random(-1000, 1000), difficulty);
             npc_list[i].set_terget(player_list);
         }
     }

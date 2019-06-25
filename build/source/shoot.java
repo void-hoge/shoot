@@ -145,6 +145,7 @@ class gun extends item{
     float dispersion;
     float gap;
     float weight;
+    float mobility;
     PImage img;
     gun(int t){
         type = t;
@@ -154,18 +155,20 @@ class gun extends item{
                 damage = 10;
                 amo = 200;
                 rate = 4;           //900rpm
-                range = 400;
+                range = 700;
                 dispersion = 0.2f;
                 weight = 0.15f;
+                mobility = 1.5f;
                 img = loadImage("SMG.png");
                 break;
             case AR:
                 damage = 20;
                 amo = 100;
                 rate = 6;           //600rpm
-                range = 700;
+                range = 1000;
                 dispersion = 0.05f;
                 weight = 0.08f;
+                mobility = 1;
                 img = loadImage("AR.png");
                 break;
             case SR:
@@ -175,6 +178,7 @@ class gun extends item{
                 range = 2000;
                 dispersion = 0.01f;
                 weight = 0.03f;
+                mobility = 0.75f;
                 img = loadImage("SR.png");
                 break;
             case HG:
@@ -184,6 +188,7 @@ class gun extends item{
                 range = 400;
                 dispersion = 0.1f;
                 weight = 0.4f;
+                mobility = 2;
                 img = loadImage("HG.png");
                 break;
         }
@@ -220,13 +225,14 @@ class npc{
     float hitpoints;
     float entity_size;
     float facing;
+    float damage_rate;
+    int heal_possibility;
     player[] target;
     gun main;
+    int type;
 
     npc(float xx, float yy){
         pos = new coordinate(xx, yy);
-        pos.x = xx;
-        pos.y = yy;
         main = new gun(HG);
         hitpoints = 100;
         entity_size = 50;
@@ -238,11 +244,41 @@ class npc{
     }
 
     npc(){
-        pos.x = 0;
-        pos.y = 0;
+        pos = new coordinate(0, 0);
         hitpoints = 100;
-        entity_size = 30;
+        entity_size = 50;
         facing = 0;
+    }
+
+    npc(float xx, float yy, int difficulty, int gun_type){
+        type = gun_type;
+        main = new gun(gun_type);
+        pos = new coordinate(xx,yy);
+        hitpoints = 100;
+        entity_size = 50;
+        facing = 0;
+        switch (difficulty){
+            case BORING:
+                damage_rate = 0.25f;
+                heal_possibility = 100;
+                break;
+            case EASY:
+                damage_rate = 0.5f;
+                heal_possibility = 80;
+                break;
+            case NORMAL:
+                damage_rate = 0.75f;
+                heal_possibility = 60;
+                break;
+            case HARD:
+                damage_rate = 1;
+                heal_possibility = 40;
+                break;
+            case INSANE:
+                damage_rate = 1;
+                heal_possibility = 20;
+                break;
+        }
     }
 
     public void shoot(){
@@ -251,7 +287,12 @@ class npc{
         }
         if ((dist(target[0].pos.x, target[0].pos.y, pos.x, pos.y) <= main.range)&&(main.shoot_ct <= 0)&&(main.amo > 0)){
             //display line
-            facing= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            float facing_target= atan2(target[0].pos.y-pos.y, target[0].pos.x-pos.x);
+            if(abs(facing_target-facing) > radians(180)){
+                facing_target+=radians(360);
+            }
+            facing += (facing_target - facing)*main.weight;
+
             translate(pos.x, pos.y);
             rotate(facing+main.gap);
             strokeWeight(3);
@@ -262,7 +303,7 @@ class npc{
 
             //culcurate hits
             coordinate end;
-            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));//unit vector
+            end = new coordinate(cos(facing+main.gap),sin(facing+main.gap));
             end.x*=main.range;
             end.x+=pos.x;
             end.y*=main.range;
@@ -287,7 +328,35 @@ class npc{
             textSize(20);
             text(hitpoints, pos.x, pos.y);
             shoot();
+        }else{
+            target[0].kill_count++;
+            switch (target[0].main.type){
+                case SMG:
+                    target[0].main.amo += 50;
+                    break;
+                case AR:
+                    target[0].main.amo += 30;
+                    break;
+                case SR:
+                    target[0].main.amo += 10;
+                    break;
+                case HG:
+                    target[0].main.amo += 20;
+                    break;
+            }
+            target[0].increase_hitpoints(20);
+            if(PApplet.parseInt(random(100))<=heal_possibility){
+                target[0].increase_armar_hitpoints(10);
+            }
+            respwan();
         }
+    }
+
+    public void respwan(){
+        pos.x = random(-1000,1000);
+        pos.y = random(-1000,1000);
+        hitpoints = 100;
+        main = new gun(type);
     }
 }
 class object{
@@ -360,14 +429,17 @@ class player{
     float facing;
     float hitpoints;
     int entity_size;    // radius
-    // int moving_vec;     //0b(up)(down)(left)(right)
 
-    private armar arma;
-    private gun main;
-    private scope sc;
+    armar arma;
+    gun main;
+    scope sc;
 
     npc[] enemy;
     gun[] item_list;
+
+    float total_damage;
+    float total_suffered_damage;
+    int kill_count;
 
     player(npc[] hoge, gun[] poyo){
         pos = new coordinate();
@@ -382,12 +454,18 @@ class player{
         entity_size = 50;
         enemy = hoge;
         item_list = poyo;
+        total_damage = 0;
+        total_suffered_damage = 0;
     }
 
     public void display(){
         if (hitpoints == 0){
             textSize(100);
-            text("You dead", pos.x, pos.y);
+            text("YOU DIED", pos.x, pos.y);
+            textSize(60);
+            fill(0);
+            text("damage: "+total_damage+" kill: "+kill_count, pos.x, pos.y+200);
+            text("suffered damage: "+total_suffered_damage, pos.x, pos.y+400);
             return;
         }
         main.display();
@@ -452,10 +530,10 @@ class player{
                 if (main.range+enemy[i].entity_size > dist(pos.x, pos.y, enemy[i].pos.x, enemy[i].pos.y)){
                     if(abs((pos.y-end.y)*enemy[i].pos.x-(pos.x-end.x)*enemy[i].pos.y+pos.x*end.y-pos.y*end.x)/sqrt((pos.y-end.y)*(pos.y-end.y)+(pos.x-end.x)*(pos.x-end.x)) < enemy[i].entity_size){
                         enemy[i].hitpoints -= main.damage;
+                        total_damage += main.damage;
                     }
                 }
             }
-
             main.shoot_ct = main.rate;
             main.set_gap();
             main.amo--;
@@ -466,16 +544,16 @@ class player{
         if (keyPressed == true){
             switch (key){
                 case 'w':
-                    pos.y-=3.0f;
+                    pos.y-=3.0f*main.mobility;
                     break;
                 case 's':
-                    pos.y+=3.0f;
+                    pos.y+=3.0f*main.mobility;
                     break;
                 case 'a':
-                    pos.x-=3.0f;
+                    pos.x-=3.0f*main.mobility;
                     break;
                 case 'd':
-                    pos.x+=3.0f;
+                    pos.x+=3.0f*main.mobility;
                     break;
             }
         }
@@ -527,29 +605,52 @@ class player{
     }
 
     public void decrease_hitpoint(float points){
+        total_suffered_damage += points;
         if (arma.hitpoints > 0){
             arma.hitpoints -= points;
             if (arma.hitpoints < 0){
                 points = -arma.hitpoints;
                 arma.hitpoints = 0;
+                hitpoints -= points;
             }
         }else{
             hitpoints -= points;
         }
         if (hitpoints < 0){
+            total_suffered_damage += hitpoints;
             hitpoints = 0;
+        }
+    }
+
+    public void increase_hitpoints(float points){
+        hitpoints += points;
+        if (hitpoints > 100){
+            hitpoints = 100;
+        }
+    }
+
+    public void increase_armar_hitpoints(float points){
+        arma.hitpoints += points;
+        if (arma.hitpoints > 25*arma.armar_level){
+            arma.hitpoints = 25*arma.armar_level;
         }
     }
 }
 class system{
     world hoge;
     system(){
-        hoge = new world();
+        hoge = new world(HARD);
     }
     public void display(){
         hoge.display();
     }
 }
+final int BORING = 0;
+final int EASY = 1;
+final int NORMAL = 2;
+final int HARD = 3;
+final int INSANE = 4;
+
 class world{
     player[] player_list;
     gun[] gun_list;
@@ -559,7 +660,6 @@ class world{
         world_width = 10000;
         world_height = 10000;
         gun_list = new gun[10];
-        gun bar;
         for (int i = 0; i < gun_list.length; i++) {
             gun_list[i] = new gun(i%4);
             gun_list[i].x = random(-world_width/2, world_width/2);
@@ -573,6 +673,40 @@ class world{
         player pl = new player(npc_list, gun_list);
         player_list[0] = pl;
         for (int i = 0; i < npc_list.length; i++){
+            npc_list[i].set_terget(player_list);
+        }
+    }
+    world(int difficulty){
+        world_width = 10000;
+        world_height = 10000;
+        gun_list = new gun[10];
+        for (int i = 0; i < gun_list.length; i++){
+            gun_list[i] = new gun(i%4);
+            gun_list[i].x = random(-world_width/2, world_height/2);
+            gun_list[i].y = random(-world_width/2, world_height/2);
+        }
+        switch (difficulty){
+            case BORING:
+                npc_list = new npc[2];
+                break;
+            case EASY:
+                npc_list = new npc[3];
+                break;
+            case NORMAL:
+                npc_list = new npc[5];
+                break;
+            case HARD:
+                npc_list = new npc[5];
+                break;
+            case INSANE:
+                npc_list = new npc[5];
+                break;
+        }
+        player_list = new player[1];
+        player pl = new player(npc_list, gun_list);
+        player_list[0] = pl;
+        for (int i = 0; i < npc_list.length; i++){
+            npc_list[i] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
             npc_list[i].set_terget(player_list);
         }
     }
