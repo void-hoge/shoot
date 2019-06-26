@@ -819,10 +819,10 @@ class system{
             noStroke();
             int begin = color(0, 255, 255);
             int end = color(255, 0, 255);
-            for (int i = 0; i < width; i+=10){
+            for (int i = 0; i < width; i+=5){
                 int c = lerpColor(begin, end, PApplet.parseFloat(i)/width);
                 fill(c);
-                rect(i, 0, 10, height);
+                rect(i, 0, 5, height);
             }
 
             if(start_button()){
@@ -860,33 +860,8 @@ public boolean start_button(){
     }
 }
 
-public int difficulty_button(int init){
-    float x = (width/2)-200;
-    float y = 150;
-    float w = 400;
-    float h = 50;
-    rectMode(CORNER);
-    textSize(50);
-    textAlign(CENTER, CENTER);
-    noStroke();
-    if ((mouseX > x)&&(mouseX < x+w)&&(mouseY > y)&&(mouseY < y+h)){
-        init++;
-        if (init > 4){
-            init = 0;
-        }
-        if (mousePressed){
-            fill(color(255, 0, 255));
-            text(difficulty_name[init], width/2, 175);
-            return init;
-        }
-        fill(color(255, 0, 255));
-        text(difficulty_name[init], width/2, 175);
-        return --init;
-    }else{
-        fill(color(0, 255, 255));
-        text(difficulty_name[init], width/2, 175);
-        return init;
-    }
+public int difficulty_button(){
+    return 1;
 }
 final int TEST = -1;
 final int BORING = 0;
