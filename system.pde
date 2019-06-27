@@ -1,14 +1,16 @@
 class system{
     world hoge;
-    boolean ismenu;
+    boolean[] ismenu_pointer;
     int difficulty;
+    difficulty_button button;
     system(){
-        ismenu = true;
+        ismenu_pointer = new boolean[1];
+        ismenu_pointer[0] = true;
         difficulty = 0;
-        hoge = new world(EASY);
+        button = new difficulty_button();
     }
     void display(){
-        if (!ismenu){
+        if (!ismenu_pointer[0]){
             hoge.display();
         }else{
             noStroke();
@@ -21,9 +23,15 @@ class system{
             }
 
             if(start_button()){
-                ismenu = false;
+                ismenu_pointer[0] = false;
+                hoge = new world(difficulty, ismenu_pointer);
             }
-            // difficulty = difficulty_button(difficulty);
+            button.boring_button(width/2-550, 200);
+            button.easy_button(width/2-280, 200);
+            button.normal_button(width/2, 200);
+            button.hard_button(width/2+280, 200);
+            button.insane_button(width/2+550, 200);
+            difficulty = button.difficulty;
         }
     }
 }
@@ -55,6 +63,88 @@ boolean start_button(){
     }
 }
 
-int difficulty_button(){
-    return 1;
+class difficulty_button{
+    int difficulty;
+    difficulty_button(){
+        difficulty = NORMAL;
+    }
+
+    // void button(float y, int size){
+    //     for (int i = 0; i <= INSANE; i++){
+    //         if (difficulty == i){
+    //             fill(0x26c6da);
+    //         }else{
+    //             fill(255);
+    //         }
+    //         textAlign(CENTER, CENTER);
+    //         textSize(size);
+    //         text(difficulty_name[i], , y);
+    //     }
+    // }
+    void boring_button(float x, float y){
+        if (difficulty == BORING){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[BORING], x, y);
+        if(mousePressed&&(mouseX > x-120)&&(mouseX < (x-120)+240)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = BORING;
+        }
+    }
+    void easy_button(float x, float y){
+        if (difficulty == EASY){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[EASY], x, y);
+        if(mousePressed&&(mouseX > x-80)&&(mouseX < (x-80)+160)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = EASY;
+        }
+    }
+    void normal_button(float x, float y){
+        if (difficulty == NORMAL){
+            // fill(0x26c6da);
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[NORMAL], x, y);
+        if(mousePressed&&(mouseX > x-120)&&(mouseX < (x-120)+240)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = NORMAL;
+        }
+    }
+    void hard_button(float x, float y){
+        if (difficulty == HARD){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[HARD], x, y);
+        if(mousePressed&&(mouseX > x-80)&&(mouseX < (x-80)+160)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = HARD;
+        }
+    }
+    void insane_button(float x, float y){
+        if (difficulty == INSANE){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[INSANE], x, y);
+        if(mousePressed&&(mouseX > x-120)&&(mouseX < (x-120)+240)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = INSANE;
+        }
+    }
 }

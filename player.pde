@@ -8,6 +8,11 @@ class coordinate{
         x = ax;
         y = ay;
     }
+    void random_on_arc(float r){
+        float kakudo = radians(random(0,360));
+        x = cos(kakudo)*r;
+        y = sin(kakudo)*r;
+    }
 }
 
 class num_and_dist{
@@ -44,7 +49,7 @@ class player{
 
     player(npc[] hoge, gun[] poyo, scope[] foo, armar[] bar){
         pos = new coordinate();
-        arma = new armar(0,0,4);
+        arma = new armar(0, 0, 4);
         arma.is_show = false;
         main = new gun(AR);
         main.is_show = false;
@@ -61,16 +66,16 @@ class player{
         total_suffered_damage = 0;
     }
 
-    void display(){
+    boolean display(){
         if (hitpoints <= 0){
             fill(color(255,0,0));
             textSize(100*sc.magnification);
             text("YOU DIED", pos.x, pos.y);
             textSize(60*sc.magnification);
             fill(0);
-            text("damage: "+int(total_damage)+" kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
+            text("damage: "+int(total_damage)+", kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
             text("suffered damage: "+int(total_suffered_damage), pos.x, pos.y+200*sc.magnification);
-            return;
+            return false;
         }
         shoot();
         translate(pos.x, pos.y);
@@ -104,6 +109,7 @@ class player{
         scope_pickup();
         armar_pickup();
         main.shoot_ct--;
+        return true;
     }
 
     void showHP(){
@@ -184,10 +190,10 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < gun_list.length; i++){
-                    if (50>dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y)){
+                    if (50>dist(pos.x, pos.y, gun_list[i].pos.x, gun_list[i].pos.y)){
+                        if(kouho.distance > dist(pos.x, pos.y, gun_list[i].pos.x, gun_list[i].pos.y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, gun_list[i].pos.x, gun_list[i].pos.y);
                         }
                     }
                 }
@@ -200,8 +206,8 @@ class player{
                     gun_list[kouho.num] = swap;
                     gun_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
-                    gun_list[kouho.num].x = pos.x + cos(kakudo)*100;
-                    gun_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    gun_list[kouho.num].pos.x = pos.x + cos(kakudo)*100;
+                    gun_list[kouho.num].pos.y = pos.y + sin(kakudo)*100;
                 }
             }
         }
@@ -212,10 +218,10 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < scope_list.length; i++){
-                    if (50>dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y)){
+                    if (50>dist(pos.x, pos.y, scope_list[i].pos.x, scope_list[i].pos.y)){
+                        if(kouho.distance > dist(pos.x, pos.y, scope_list[i].pos.x, scope_list[i].pos.y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, scope_list[i].pos.x, scope_list[i].pos.y);
                         }
                     }
                 }
@@ -228,8 +234,8 @@ class player{
                     scope_list[kouho.num] = swap;
                     scope_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
-                    scope_list[kouho.num].x = pos.x + cos(kakudo)*100;
-                    scope_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    scope_list[kouho.num].pos.x = pos.x + cos(kakudo)*100;
+                    scope_list[kouho.num].pos.y = pos.y + sin(kakudo)*100;
                 }
             }
         }
@@ -240,10 +246,10 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < armar_list.length; i++){
-                    if (50>dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y)){
+                    if (50>dist(pos.x, pos.y, armar_list[i].pos.x, armar_list[i].pos.y)){
+                        if(kouho.distance > dist(pos.x, pos.y, armar_list[i].pos.x, armar_list[i].pos.y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, armar_list[i].pos.x, armar_list[i].pos.y);
                         }
                     }
                 }
@@ -256,8 +262,8 @@ class player{
                     armar_list[kouho.num] = swap;
                     armar_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
-                    armar_list[kouho.num].x = pos.x + cos(kakudo)*100;
-                    armar_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    armar_list[kouho.num].pos.x = pos.x + cos(kakudo)*100;
+                    armar_list[kouho.num].pos.y = pos.y + sin(kakudo)*100;
                 }
             }
         }

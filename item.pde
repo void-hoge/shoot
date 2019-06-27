@@ -1,5 +1,5 @@
 abstract class item{
-    float x, y;
+    coordinate pos;
     boolean is_show;
     abstract void display();
 }
@@ -12,12 +12,12 @@ abstract class item{
 class scope extends item{
     float magnification;
     scope(float mag){
+        pos = new coordinate(0,0);
         is_show = false;
         magnification = mag;
     }
     scope(float xx, float yy, float num){
-        x = xx;
-        y = yy;
+        pos = new coordinate(xx,yy);
         is_show = true;
         magnification = num;
     }
@@ -25,11 +25,11 @@ class scope extends item{
         if (is_show){
             fill(color(0, 0, 255));
             textSize(30);
-            text(int(magnification), x, y+10);
+            text(int(magnification), pos.x, pos.y+10);
             strokeWeight(3);
             stroke(color(0, 0, 255));
             noFill();
-            ellipse(x, y, 40, 40);
+            ellipse(pos.x, pos.y, 40, 40);
         }
     }
 }
@@ -39,8 +39,9 @@ class armar extends item{
     float hitpoints;
     PImage img;
     armar(float xx, float yy, int level){
-        x = xx;
-        y = yy;
+        pos = new coordinate(xx,yy);
+        pos.x = xx;
+        pos.y = yy;
         armar_level = level;
         hitpoints = armar_level*25;
         is_show = true;
@@ -64,7 +65,7 @@ class armar extends item{
     }
     void display(){
         if (is_show){
-            image(img, x, y, 100, 100);
+            image(img, pos.x, pos.y, 100, 100);
         }
     }
     void showHP(){
@@ -118,6 +119,7 @@ class gun extends item{
     PImage img;
     gun(int t){
         type = t;
+        pos = new coordinate();
         is_show = true;
         switch (type){
             case SMG:
@@ -141,7 +143,7 @@ class gun extends item{
                 img = loadImage("AR.png");
                 break;
             case SR:
-                damage = 90;
+                damage = 100;
                 amo = 20;
                 rate = 120;         //30rpm
                 range = 2000;
@@ -154,7 +156,7 @@ class gun extends item{
                 damage = 15;
                 amo = 100;
                 rate = 20;          //180rpm
-                range = 400;
+                range = 600;
                 dispersion = 0.1;
                 weight = 0.4;
                 mobility = 2;
@@ -163,8 +165,8 @@ class gun extends item{
         }
         shoot_ct = 0;
         set_gap();
-        x = 0;
-        y = 0;
+        pos.x = 0;
+        pos.y = 0;
     }
     void set_gap(){
         gap = random(-dispersion, dispersion);
@@ -174,16 +176,16 @@ class gun extends item{
             imageMode(CENTER);
             switch (type){
                 case SMG:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
                 case AR:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
                 case SR:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
                 case HG:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
             }
         }

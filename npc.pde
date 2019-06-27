@@ -192,8 +192,7 @@ class npc{
     }
 
     void respwan(){
-        pos.x = random(-1000,1000);
-        pos.y = random(-1000,1000);
+        pos.random_on_arc(1500);
         hitpoints = 100;
         main = new gun(type);
     }

@@ -27,7 +27,7 @@ public void draw(){
     sys.display();
 }
 abstract class item{
-    float x, y;
+    coordinate pos;
     boolean is_show;
     public abstract void display();
 }
@@ -40,12 +40,12 @@ abstract class item{
 class scope extends item{
     float magnification;
     scope(float mag){
+        pos = new coordinate(0,0);
         is_show = false;
         magnification = mag;
     }
     scope(float xx, float yy, float num){
-        x = xx;
-        y = yy;
+        pos = new coordinate(xx,yy);
         is_show = true;
         magnification = num;
     }
@@ -53,11 +53,11 @@ class scope extends item{
         if (is_show){
             fill(color(0, 0, 255));
             textSize(30);
-            text(PApplet.parseInt(magnification), x, y+10);
+            text(PApplet.parseInt(magnification), pos.x, pos.y+10);
             strokeWeight(3);
             stroke(color(0, 0, 255));
             noFill();
-            ellipse(x, y, 40, 40);
+            ellipse(pos.x, pos.y, 40, 40);
         }
     }
 }
@@ -67,8 +67,9 @@ class armar extends item{
     float hitpoints;
     PImage img;
     armar(float xx, float yy, int level){
-        x = xx;
-        y = yy;
+        pos = new coordinate(xx,yy);
+        pos.x = xx;
+        pos.y = yy;
         armar_level = level;
         hitpoints = armar_level*25;
         is_show = true;
@@ -92,7 +93,7 @@ class armar extends item{
     }
     public void display(){
         if (is_show){
-            image(img, x, y, 100, 100);
+            image(img, pos.x, pos.y, 100, 100);
         }
     }
     public void showHP(){
@@ -146,6 +147,7 @@ class gun extends item{
     PImage img;
     gun(int t){
         type = t;
+        pos = new coordinate();
         is_show = true;
         switch (type){
             case SMG:
@@ -169,7 +171,7 @@ class gun extends item{
                 img = loadImage("AR.png");
                 break;
             case SR:
-                damage = 90;
+                damage = 100;
                 amo = 20;
                 rate = 120;         //30rpm
                 range = 2000;
@@ -182,7 +184,7 @@ class gun extends item{
                 damage = 15;
                 amo = 100;
                 rate = 20;          //180rpm
-                range = 400;
+                range = 600;
                 dispersion = 0.1f;
                 weight = 0.4f;
                 mobility = 2;
@@ -191,8 +193,8 @@ class gun extends item{
         }
         shoot_ct = 0;
         set_gap();
-        x = 0;
-        y = 0;
+        pos.x = 0;
+        pos.y = 0;
     }
     public void set_gap(){
         gap = random(-dispersion, dispersion);
@@ -202,16 +204,16 @@ class gun extends item{
             imageMode(CENTER);
             switch (type){
                 case SMG:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
                 case AR:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
                 case SR:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
                 case HG:
-                    image(img, x, y, 200, 100);
+                    image(img, pos.x, pos.y, 200, 100);
                     break;
             }
         }
@@ -411,8 +413,7 @@ class npc{
     }
 
     public void respwan(){
-        pos.x = random(-1000,1000);
-        pos.y = random(-1000,1000);
+        pos.random_on_arc(1500);
         hitpoints = 100;
         main = new gun(type);
     }
@@ -512,6 +513,11 @@ class coordinate{
         x = ax;
         y = ay;
     }
+    public void random_on_arc(float r){
+        float kakudo = radians(random(0,360));
+        x = cos(kakudo)*r;
+        y = sin(kakudo)*r;
+    }
 }
 
 class num_and_dist{
@@ -548,7 +554,7 @@ class player{
 
     player(npc[] hoge, gun[] poyo, scope[] foo, armar[] bar){
         pos = new coordinate();
-        arma = new armar(0,0,4);
+        arma = new armar(0, 0, 4);
         arma.is_show = false;
         main = new gun(AR);
         main.is_show = false;
@@ -565,16 +571,16 @@ class player{
         total_suffered_damage = 0;
     }
 
-    public void display(){
+    public boolean display(){
         if (hitpoints <= 0){
             fill(color(255,0,0));
             textSize(100*sc.magnification);
             text("YOU DIED", pos.x, pos.y);
             textSize(60*sc.magnification);
             fill(0);
-            text("damage: "+PApplet.parseInt(total_damage)+" kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
+            text("damage: "+PApplet.parseInt(total_damage)+", kill: "+kill_count, pos.x, pos.y+100*sc.magnification);
             text("suffered damage: "+PApplet.parseInt(total_suffered_damage), pos.x, pos.y+200*sc.magnification);
-            return;
+            return false;
         }
         shoot();
         translate(pos.x, pos.y);
@@ -608,6 +614,7 @@ class player{
         scope_pickup();
         armar_pickup();
         main.shoot_ct--;
+        return true;
     }
 
     public void showHP(){
@@ -688,10 +695,10 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < gun_list.length; i++){
-                    if (50>dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y)){
+                    if (50>dist(pos.x, pos.y, gun_list[i].pos.x, gun_list[i].pos.y)){
+                        if(kouho.distance > dist(pos.x, pos.y, gun_list[i].pos.x, gun_list[i].pos.y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, gun_list[i].x, gun_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, gun_list[i].pos.x, gun_list[i].pos.y);
                         }
                     }
                 }
@@ -704,8 +711,8 @@ class player{
                     gun_list[kouho.num] = swap;
                     gun_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
-                    gun_list[kouho.num].x = pos.x + cos(kakudo)*100;
-                    gun_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    gun_list[kouho.num].pos.x = pos.x + cos(kakudo)*100;
+                    gun_list[kouho.num].pos.y = pos.y + sin(kakudo)*100;
                 }
             }
         }
@@ -716,10 +723,10 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < scope_list.length; i++){
-                    if (50>dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y)){
+                    if (50>dist(pos.x, pos.y, scope_list[i].pos.x, scope_list[i].pos.y)){
+                        if(kouho.distance > dist(pos.x, pos.y, scope_list[i].pos.x, scope_list[i].pos.y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, scope_list[i].x, scope_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, scope_list[i].pos.x, scope_list[i].pos.y);
                         }
                     }
                 }
@@ -732,8 +739,8 @@ class player{
                     scope_list[kouho.num] = swap;
                     scope_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
-                    scope_list[kouho.num].x = pos.x + cos(kakudo)*100;
-                    scope_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    scope_list[kouho.num].pos.x = pos.x + cos(kakudo)*100;
+                    scope_list[kouho.num].pos.y = pos.y + sin(kakudo)*100;
                 }
             }
         }
@@ -744,10 +751,10 @@ class player{
             if(key == 'e'){
                 num_and_dist kouho = new num_and_dist(2147483647, 1000000);
                 for (int i = 0; i < armar_list.length; i++){
-                    if (50>dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y)){
-                        if(kouho.distance > dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y)){
+                    if (50>dist(pos.x, pos.y, armar_list[i].pos.x, armar_list[i].pos.y)){
+                        if(kouho.distance > dist(pos.x, pos.y, armar_list[i].pos.x, armar_list[i].pos.y)){
                             kouho.num = i;
-                            kouho.distance = dist(pos.x, pos.y, armar_list[i].x, armar_list[i].y);
+                            kouho.distance = dist(pos.x, pos.y, armar_list[i].pos.x, armar_list[i].pos.y);
                         }
                     }
                 }
@@ -760,8 +767,8 @@ class player{
                     armar_list[kouho.num] = swap;
                     armar_list[kouho.num].is_show = true;
                     float kakudo = random(0, radians(360));
-                    armar_list[kouho.num].x = pos.x + cos(kakudo)*100;
-                    armar_list[kouho.num].y = pos.y + sin(kakudo)*100;
+                    armar_list[kouho.num].pos.x = pos.x + cos(kakudo)*100;
+                    armar_list[kouho.num].pos.y = pos.y + sin(kakudo)*100;
                 }
             }
         }
@@ -805,15 +812,17 @@ class player{
 }
 class system{
     world hoge;
-    boolean ismenu;
+    boolean[] ismenu_pointer;
     int difficulty;
+    difficulty_button button;
     system(){
-        ismenu = true;
+        ismenu_pointer = new boolean[1];
+        ismenu_pointer[0] = true;
         difficulty = 0;
-        hoge = new world(EASY);
+        button = new difficulty_button();
     }
     public void display(){
-        if (!ismenu){
+        if (!ismenu_pointer[0]){
             hoge.display();
         }else{
             noStroke();
@@ -826,9 +835,15 @@ class system{
             }
 
             if(start_button()){
-                ismenu = false;
+                ismenu_pointer[0] = false;
+                hoge = new world(difficulty, ismenu_pointer);
             }
-            // difficulty = difficulty_button(difficulty);
+            button.boring_button(width/2-550, 200);
+            button.easy_button(width/2-280, 200);
+            button.normal_button(width/2, 200);
+            button.hard_button(width/2+280, 200);
+            button.insane_button(width/2+550, 200);
+            difficulty = button.difficulty;
         }
     }
 }
@@ -860,8 +875,90 @@ public boolean start_button(){
     }
 }
 
-public int difficulty_button(){
-    return 1;
+class difficulty_button{
+    int difficulty;
+    difficulty_button(){
+        difficulty = NORMAL;
+    }
+
+    // void button(float y, int size){
+    //     for (int i = 0; i <= INSANE; i++){
+    //         if (difficulty == i){
+    //             fill(0x26c6da);
+    //         }else{
+    //             fill(255);
+    //         }
+    //         textAlign(CENTER, CENTER);
+    //         textSize(size);
+    //         text(difficulty_name[i], , y);
+    //     }
+    // }
+    public void boring_button(float x, float y){
+        if (difficulty == BORING){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[BORING], x, y);
+        if(mousePressed&&(mouseX > x-120)&&(mouseX < (x-120)+240)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = BORING;
+        }
+    }
+    public void easy_button(float x, float y){
+        if (difficulty == EASY){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[EASY], x, y);
+        if(mousePressed&&(mouseX > x-80)&&(mouseX < (x-80)+160)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = EASY;
+        }
+    }
+    public void normal_button(float x, float y){
+        if (difficulty == NORMAL){
+            // fill(0x26c6da);
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[NORMAL], x, y);
+        if(mousePressed&&(mouseX > x-120)&&(mouseX < (x-120)+240)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = NORMAL;
+        }
+    }
+    public void hard_button(float x, float y){
+        if (difficulty == HARD){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[HARD], x, y);
+        if(mousePressed&&(mouseX > x-80)&&(mouseX < (x-80)+160)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = HARD;
+        }
+    }
+    public void insane_button(float x, float y){
+        if (difficulty == INSANE){
+            fill(color(153, 17, 238));
+        }else{
+            fill(255);
+        }
+        textAlign(CENTER, CENTER);
+        textSize(70);
+        text(difficulty_name[INSANE], x, y);
+        if(mousePressed&&(mouseX > x-120)&&(mouseX < (x-120)+240)&&(mouseY > y-35)&&(mouseY < (y-35)+70)){
+            difficulty = INSANE;
+        }
+    }
 }
 final int TEST = -1;
 final int BORING = 0;
@@ -878,6 +975,7 @@ class world{
     armar[] armar_list;
     core[] core_list;
     boolean isgameover;
+    boolean[] back_to_menu;
     int score;
     float world_width, world_height;
     world(){
@@ -886,12 +984,14 @@ class world{
         gun_list = new gun[10];
         for (int i = 0; i < gun_list.length; i++) {
             gun_list[i] = new gun(i%4);
-            gun_list[i].x = random(-world_width/2, world_width/2);
-            gun_list[i].y = random(-world_width/2, world_height/2);
+            // gun_list[i].x = random(-world_width/2, world_width/2);
+            // gun_list[i].y = random(-world_width/2, world_height/2);
+            gun_list[i].pos.random_on_arc(1000);
         }
         npc_list = new npc[5];
         for (int i = 0; i < npc_list.length; i++){
-            npc_list[i] = new npc(random(-1000,1000), random(-1000,1000));
+            npc_list[i] = new npc(0,0);
+            npc_list[i].pos.random_on_arc(3000);
         }
         player_list = new player[1];
         player pl = new player(npc_list, gun_list, scope_list, armar_list);
@@ -900,63 +1000,87 @@ class world{
             npc_list[i].set_terget(player_list, core_list);
         }
     }
-    world(int difficulty){
+    world(int difficulty, boolean[] back_to){
+        back_to_menu = back_to;
         world_width = 10000;
         world_height = 10000;
         gun_list = new gun[10];
         for (int i = 0; i < gun_list.length; i++){
             gun_list[i] = new gun(i%4);
-            gun_list[i].x = random(-world_width/2, world_height/2);
-            gun_list[i].y = random(-world_width/2, world_height/2);
+            // gun_list[i].x = random(-world_width/2, world_height/2);
+            // gun_list[i].y = random(-world_width/2, world_height/2);
+            gun_list[i].pos.random_on_arc(1000);
         }
         scope_list = new scope[4];
         for (int i = 0; i < scope_list.length; i++){
-            scope_list[i] = new scope(random(-300, 300), random(-300, 300), PApplet.parseFloat(i+1));
+            scope_list[i] = new scope(0, 0, PApplet.parseFloat(i+1));
+            scope_list[i].pos.random_on_arc(800);
         }
         armar_list = new armar[4];
         for (int i = 0; i < armar_list.length; i++){
-            armar_list[i] = new armar(random(-300, 300), random(-300, 300), (i%4)+1);
+            armar_list[i] = new armar(0, 0, (i%4)+1);
+            armar_list[i].pos.random_on_arc(800);
         }
         switch (difficulty){
             case TEST:
                 npc_list = new npc[1];
-                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), EASY, HG);
+                npc_list[0] = new npc(0, 0, EASY, HG);
+                npc_list[0].pos.random_on_arc(3000);
                 break;
             case BORING:
                 npc_list = new npc[2];
                 for (int i = 0; i < npc_list.length; i++){
-                    npc_list[i] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
+                    npc_list[i] = new npc(0,0, difficulty, HG);
+                    npc_list[i].pos.random_on_arc(3000);
                 }
                 break;
             case EASY:
                 npc_list = new npc[3];
-                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
-                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
-                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
+                npc_list[0] = new npc(0,0, difficulty, HG);
+                npc_list[1] = new npc(0,0, difficulty, HG);
+                npc_list[2] = new npc(0,0, difficulty, SMG);
+                npc_list[0].pos.random_on_arc(3000);
+                npc_list[1].pos.random_on_arc(3000);
+                npc_list[2].pos.random_on_arc(3000);
                 break;
             case NORMAL:
                 npc_list = new npc[5];
-                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
-                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
-                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
-                npc_list[3] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
-                npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
+                npc_list[0] = new npc(0,0, difficulty, HG);
+                npc_list[1] = new npc(0,0, difficulty, HG);
+                npc_list[2] = new npc(0,0, difficulty, SMG);
+                npc_list[3] = new npc(0,0, difficulty, SMG);
+                npc_list[4] = new npc(0,0, difficulty, AR);
+                npc_list[0].pos.random_on_arc(3000);
+                npc_list[1].pos.random_on_arc(3000);
+                npc_list[2].pos.random_on_arc(3000);
+                npc_list[3].pos.random_on_arc(3000);
+                npc_list[4].pos.random_on_arc(3000);
                 break;
             case HARD:
                 npc_list = new npc[5];
-                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, HG);
-                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
-                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SMG);
-                npc_list[3] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
-                npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
+                npc_list[0] = new npc(0,0, difficulty, HG);
+                npc_list[1] = new npc(0,0, difficulty, SMG);
+                npc_list[2] = new npc(0,0, difficulty, SMG);
+                npc_list[3] = new npc(0,0, difficulty, AR);
+                npc_list[4] = new npc(0,0, difficulty, SR);
+                npc_list[0].pos.random_on_arc(3000);
+                npc_list[1].pos.random_on_arc(3000);
+                npc_list[2].pos.random_on_arc(3000);
+                npc_list[3].pos.random_on_arc(3000);
+                npc_list[4].pos.random_on_arc(3000);
                 break;
             case INSANE:
                 npc_list = new npc[5];
-                npc_list[0] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
-                npc_list[1] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
-                npc_list[2] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, AR);
-                npc_list[3] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
-                npc_list[4] = new npc(random(-1000,1000), random(-1000, 1000), difficulty, SR);
+                npc_list[0] = new npc(0,0, difficulty, AR);
+                npc_list[1] = new npc(0,0, difficulty, AR);
+                npc_list[2] = new npc(0,0, difficulty, AR);
+                npc_list[3] = new npc(0,0, difficulty, SR);
+                npc_list[4] = new npc(0,0, difficulty, SR);
+                // npc_list[0].pos.random_on_arc(3000);
+                // npc_list[1].pos.random_on_arc(3000);
+                // npc_list[2].pos.random_on_arc(3000);
+                // npc_list[3].pos.random_on_arc(3000);
+                // npc_list[4].pos.random_on_arc(3000);
                 break;
         }
 
@@ -1000,20 +1124,45 @@ class world{
         for (int i = 0; i < armar_list.length; i++){
             armar_list[i].display();
         }
-        if(!core_list[0].display()){
+
+        if((!core_list[0].display())||(!player_list[0].display())){
             isgameover = true;
             textSize(100*player_list[0].sc.magnification);
             fill(255, 0, 0);
-            text("Game Over", 0, 0);
+            text("GAME OVER", player_list[0].pos.x, player_list[0].pos.y-300*player_list[0].sc.magnification);
 
             textSize(60*player_list[0].sc.magnification);
             fill(0);
-            text("Score: "+score, 0, 100*player_list[0].sc.magnification);
+            text("Score: "+score, player_list[0].pos.x, player_list[0].pos.y-150*player_list[0].sc.magnification);
+            back_to_menu_button();
         }
         if(isgameover == false){
             score++;
         }
-        player_list[0].display();
+    }
+    public boolean back_to_menu_button(){
+        float x = 0;
+        float y = height/2+200*player_list[0].sc.magnification;
+        float w = 200*player_list[0].sc.magnification;
+        float h = 50*player_list[0].sc.magnification;
+        rectMode(CORNER);
+        textSize(50*player_list[0].sc.magnification);
+        textAlign(CENTER, CENTER);
+        noStroke();
+        if ((mouseX > player_list[0].pos.x + x-w/2)&&(mouseX < player_list[0].pos.x+(x-w/2)+w)&&(mouseY > player_list[0].pos.y+(y-h/2))&&(mouseY < player_list[0].pos.y+(y-h/2)+h)){
+            if (mousePressed){
+                fill(color(153, 17, 238));
+                text("back to menu", player_list[0].pos.x + x, player_list[0].pos.y+y);
+                return true;
+            }
+            fill(color(153, 17, 238));
+            text("back to menu", player_list[0].pos.x + x, player_list[0].pos.y+y);
+            return false;
+        }else{
+            fill(color(153, 17, 238));
+            text("back to menu", player_list[0].pos.x + x, player_list[0].pos.y+y);
+            return false;
+        }
     }
 }
   public void settings() {  size(1440, 810); }
