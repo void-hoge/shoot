@@ -32,11 +32,6 @@ abstract class item{
     public abstract void display();
 }
 
-// final int NONE = 0;
-// final int SCOPE = 1;
-// final int ARMAR = 2;
-// final int GUN = 3;
-
 class scope extends item{
     float magnification;
     scope(float mag){
@@ -880,19 +875,6 @@ class difficulty_button{
     difficulty_button(){
         difficulty = NORMAL;
     }
-
-    // void button(float y, int size){
-    //     for (int i = 0; i <= INSANE; i++){
-    //         if (difficulty == i){
-    //             fill(0x26c6da);
-    //         }else{
-    //             fill(255);
-    //         }
-    //         textAlign(CENTER, CENTER);
-    //         textSize(size);
-    //         text(difficulty_name[i], , y);
-    //     }
-    // }
     public void boring_button(float x, float y){
         if (difficulty == BORING){
             fill(color(153, 17, 238));
@@ -984,8 +966,6 @@ class world{
         gun_list = new gun[10];
         for (int i = 0; i < gun_list.length; i++) {
             gun_list[i] = new gun(i%4);
-            // gun_list[i].x = random(-world_width/2, world_width/2);
-            // gun_list[i].y = random(-world_width/2, world_height/2);
             gun_list[i].pos.random_on_arc(1000);
         }
         npc_list = new npc[5];
@@ -1007,8 +987,6 @@ class world{
         gun_list = new gun[10];
         for (int i = 0; i < gun_list.length; i++){
             gun_list[i] = new gun(i%4);
-            // gun_list[i].x = random(-world_width/2, world_height/2);
-            // gun_list[i].y = random(-world_width/2, world_height/2);
             gun_list[i].pos.random_on_arc(1000);
         }
         scope_list = new scope[4];
@@ -1076,18 +1054,16 @@ class world{
                 npc_list[2] = new npc(0,0, difficulty, AR);
                 npc_list[3] = new npc(0,0, difficulty, SR);
                 npc_list[4] = new npc(0,0, difficulty, SR);
-                // npc_list[0].pos.random_on_arc(3000);
-                // npc_list[1].pos.random_on_arc(3000);
-                // npc_list[2].pos.random_on_arc(3000);
-                // npc_list[3].pos.random_on_arc(3000);
-                // npc_list[4].pos.random_on_arc(3000);
+                npc_list[0].pos.random_on_arc(3000);
+                npc_list[1].pos.random_on_arc(3000);
+                npc_list[2].pos.random_on_arc(3000);
+                npc_list[3].pos.random_on_arc(3000);
+                npc_list[4].pos.random_on_arc(3000);
                 break;
         }
 
         core_list = new core[1];
         core_list[0] = new core();
-        // player pl = new player(npc_list, gun_list, scope_list, armar_list);
-        // player_list[0] = pl;
         player_list = new player[1];
         player_list[0] = new player(npc_list, gun_list, scope_list, armar_list);
         for (int i = 0; i < npc_list.length; i++){
@@ -1134,7 +1110,7 @@ class world{
             textSize(60*player_list[0].sc.magnification);
             fill(0);
             text("Score: "+score, player_list[0].pos.x, player_list[0].pos.y-150*player_list[0].sc.magnification);
-            back_to_menu_button();
+            // back_to_menu_button();
         }
         if(isgameover == false){
             score++;

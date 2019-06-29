@@ -68,19 +68,6 @@ class difficulty_button{
     difficulty_button(){
         difficulty = NORMAL;
     }
-
-    // void button(float y, int size){
-    //     for (int i = 0; i <= INSANE; i++){
-    //         if (difficulty == i){
-    //             fill(0x26c6da);
-    //         }else{
-    //             fill(255);
-    //         }
-    //         textAlign(CENTER, CENTER);
-    //         textSize(size);
-    //         text(difficulty_name[i], , y);
-    //     }
-    // }
     void boring_button(float x, float y){
         if (difficulty == BORING){
             fill(color(153, 17, 238));

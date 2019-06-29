@@ -4,11 +4,6 @@ abstract class item{
     abstract void display();
 }
 
-// final int NONE = 0;
-// final int SCOPE = 1;
-// final int ARMAR = 2;
-// final int GUN = 3;
-
 class scope extends item{
     float magnification;
     scope(float mag){

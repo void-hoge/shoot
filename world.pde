@@ -22,8 +22,6 @@ class world{
         gun_list = new gun[10];
         for (int i = 0; i < gun_list.length; i++) {
             gun_list[i] = new gun(i%4);
-            // gun_list[i].x = random(-world_width/2, world_width/2);
-            // gun_list[i].y = random(-world_width/2, world_height/2);
             gun_list[i].pos.random_on_arc(1000);
         }
         npc_list = new npc[5];
@@ -45,8 +43,6 @@ class world{
         gun_list = new gun[10];
         for (int i = 0; i < gun_list.length; i++){
             gun_list[i] = new gun(i%4);
-            // gun_list[i].x = random(-world_width/2, world_height/2);
-            // gun_list[i].y = random(-world_width/2, world_height/2);
             gun_list[i].pos.random_on_arc(1000);
         }
         scope_list = new scope[4];
@@ -114,18 +110,16 @@ class world{
                 npc_list[2] = new npc(0,0, difficulty, AR);
                 npc_list[3] = new npc(0,0, difficulty, SR);
                 npc_list[4] = new npc(0,0, difficulty, SR);
-                // npc_list[0].pos.random_on_arc(3000);
-                // npc_list[1].pos.random_on_arc(3000);
-                // npc_list[2].pos.random_on_arc(3000);
-                // npc_list[3].pos.random_on_arc(3000);
-                // npc_list[4].pos.random_on_arc(3000);
+                npc_list[0].pos.random_on_arc(3000);
+                npc_list[1].pos.random_on_arc(3000);
+                npc_list[2].pos.random_on_arc(3000);
+                npc_list[3].pos.random_on_arc(3000);
+                npc_list[4].pos.random_on_arc(3000);
                 break;
         }
 
         core_list = new core[1];
         core_list[0] = new core();
-        // player pl = new player(npc_list, gun_list, scope_list, armar_list);
-        // player_list[0] = pl;
         player_list = new player[1];
         player_list[0] = new player(npc_list, gun_list, scope_list, armar_list);
         for (int i = 0; i < npc_list.length; i++){
