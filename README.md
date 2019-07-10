@@ -1,10 +1,11 @@
 # SHOOT
 
-A TPS game inspired by [surviv.io](http://surviv.io).
+A TPS game inspired by [surviv.io](http://surviv.io).  
+This game is a [processing](https://processing.org) project.
 
 ## Installation
 
-Open "shoot.pde" in processing IDE, then click "RUN" button.
+Open [shoot.pde](shoot/shoot.pde) in processing IDE, then click "RUN" button.
 
 ## Usage
 
@@ -30,12 +31,12 @@ Open "shoot.pde" in processing IDE, then click "RUN" button.
     - The score is displayed on the game over screen.
 - ### Items
     - #### Guns
-        - ##### Assault Rifle (AR.png)
+        - ##### Assault Rifle ([AR.png](shoot/AR.png))
             - Medium range, rapid fire and good DPM(damage per minute).
-        - ##### Sub machine-gun (SMG.png)
+        - ##### Sub machine-gun ([SMG.png](shoot/SMG.png))
             - Super rapid fire.
             - Short range and bad accuracy.
-        - ##### Sniper Rifle (SR.png)
+        - ##### Sniper Rifle ([SR.png](shoot/SR.png))
             - Super long range, Extremely high damage and high accuracy.
             - Slow reload, bad operability and mobility.
         - ##### Hand gun (HG.png)
@@ -97,13 +98,13 @@ All codes are referenced [official reference](https://processing.org/reference/)
 - All pictures are drawn using Microsoft Paint.
 - [This site](https://www.peko-step.com/tool/alphachannel.html) is used for transparent background.
     ##### Referenced image of guns
-    - AR.png
+    - [AR.png](shoot/AR.png)
         - [FN SCAR® 17S](https://fnamerica.com/products/rifles/fn-scar-17s/)
-    - SMG.png
+    - [SMG.png](shoot/SMG.png)
         - [H&K MP5A3](https://hk-usa.com/hk-models/mp5a3-2/)
-    - SR.png
+    - [SR.png](shoot/SR.png)
         - [Barrett Firearms MODEL 82A1®](https://barrett.net/firearms/model82a1)
-    - HG.png
+    - [HG.png](HG.png)
         - [Glock G17 Gen 5](https://us.glock.com/en/pistols/g17-gen5)
 
 ## License
