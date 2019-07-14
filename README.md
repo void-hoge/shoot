@@ -1,7 +1,7 @@
 # SHOOT
 
 A TPS game inspired by [surviv.io](http://surviv.io).  
-This game is a [processing](https://processing.org) project.
+This game is written in [processing](https://processing.org).
 
 ## Installation
 
